@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Flexiple Hiring Hub</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: forest-green header and hero band, then white page with cream cards; one centred 72rem column. */
+  :root {
+    --forest: #072C1B;
+    --lime: #CFF07D;
+    --cream: #F9ECE3;
+    --rust: #A85A34;
+    --white: #FFFFFF;
+    --muted: #55665C;
+    --line: #E2E7E0;
+    --low-bg: #DCEFD8; --low-fg: #245C37;
+    --mid-bg: #FBEBC6; --mid-fg: #7A5300;
+    --high-bg: #F5D3C4; --high-fg: #8F3415;
+    --font: Arial, Helvetica, sans-serif;
+    color-scheme: light;
+  }
+  html, body { background: var(--white); color: var(--forest); font-family: var(--font); }
+  body { font-size: 15px; line-height: 1.5; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--forest); }
+  h1, h2, h3 { text-wrap: balance; }
+  .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  @media (min-width: 768px) {
+    .gutter { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); }
+  }
+  .site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+  .label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rust); }
+  .card { background: var(--cream); border-radius: 13px; padding: 20px; }
+  @media (min-width: 768px) { .card { padding: 24px; } }
+  .tile { background: var(--white); border: 1px solid var(--line); border-radius: 13px; padding: 16px; }
+  .num { font-variant-numeric: tabular-nums; }
+  /* Grid items default to min-width:auto, which lets a wide table stretch the page on phones. */
+  .grid > * { min-width: 0; }
+  .fade { transition: opacity .2s; }
+  .is-loading { opacity: .55; }
+
+  /* Round tracker: stacked on phones, one row of steps on wide screens. */
+  .steps { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); list-style: none; padding: 0; margin: 0; }
+  .step { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; background: var(--white); border: 1px solid var(--line); min-width: 0; }
+  .step .dot { flex: none; width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; font-weight: 700; font-size: 13px; border: 1px solid var(--line); color: var(--muted); background: var(--white); }
+  .step-done .dot { background: var(--forest); color: var(--lime); border-color: var(--forest); }
+  .step-current { background: var(--lime); border-color: var(--lime); }
+  .step-current .dot { background: var(--forest); color: var(--lime); border-color: var(--forest); }
+  .step-stopped { border-color: var(--rust); }
+  .step-stopped .dot { background: var(--rust); color: var(--white); border-color: var(--rust); }
+  .step-upcoming { color: var(--muted); }
+  @media (min-width: 960px) {
+    .steps { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; }
+    .step { flex-direction: column; align-items: flex-start; padding: 12px; }
+  }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 13px; }
+  .table-wrap table { width: 100%; border-collapse: collapse; min-width: 760px; font-size: 14px; }
+  .table-wrap th { background: var(--forest); color: var(--lime); text-align: left; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 12px 14px; font-weight: 700; }
+  .table-wrap td { padding: 14px; border-top: 1px solid var(--line); vertical-align: top; }
+
+  .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 30; max-width: calc(100% - 32px); width: max-content; }
+  button:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--rust); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div id="root"></div>
+
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  tailwind.config = {
+    corePlugins: { preflight: true },
+    theme: {
+      extend: {
+        colors: { forest: '#072C1B', lime: '#CFF07D', cream: '#F9ECE3', rust: '#A85A34', muted: '#55665C', line: '#E2E7E0' },
+        fontFamily: { sans: ['Arial', 'Helvetica', 'sans-serif'] },
+      },
+    },
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="api.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useCallback } = React;
+const api = window.HubAPI;
+
+/* ---------- helpers ---------- */
+
+const fmt = t => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+const fmtLong = t => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const plural = (n, word, many) => `${n} ${n === 1 ? word : many || word + 's'}`;
+const ago = days => (days === 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`);
+const hoursAgo = t => {
+  const h = Math.round((Date.now() - t) / 3600000);
+  if (h < 1) return 'just now';
+  if (h < 24) return `${h} h ago`;
+  return ago(Math.round(h / 24));
+};
+const CHANNELS = ['inapp', 'email', 'whatsapp'];
+const CHANNEL_LABEL = { inapp: 'In-app', email: 'Email', whatsapp: 'WhatsApp' };
+const STATUS_LABEL = { active: 'In process', offer: 'Offer made', accepted: 'Offer accepted', rejected: 'Not selected', paused: 'On hold', joined: 'Joined' };
+
+// Fetches on mount and whenever deps change; keeps the last data while reloading.
+function useApi(fn, deps) {
+  const [state, setState] = useState({ data: null, loading: true });
+  useEffect(() => {
+    let live = true;
+    setState(s => ({ data: s.data, loading: true }));
+    fn().then(data => { if (live) setState({ data, loading: false }); })
+      .catch(() => { if (live) setState(s => ({ data: s.data, loading: false })); });
+    return () => { live = false; };
+  }, deps);
+  return state;
+}
+
+// Runs one mutation at a time, refreshes every view, and reports the result.
+function useRunner(bump, notify) {
+  const [busy, setBusy] = useState(null);
+  const run = async (key, fn, message) => {
+    setBusy(key);
+    try {
+      const result = await fn();
+      bump();
+      if (message) notify(typeof message === 'function' ? message(result) : message);
+    } catch (e) {
+      notify(e.message, 'error');
+    } finally {
+      setBusy(null);
+    }
+  };
+  return [busy, run];
+}
+
+/* ---------- small building blocks ---------- */
+
+function Btn({ kind = 'primary', small, className = '', ...props }) {
+  const size = small ? 'px-3.5 py-1.5 text-xs' : 'px-5 py-2.5 text-sm';
+  const look = {
+    primary: 'bg-forest text-lime hover:bg-[#0E3D27]',
+    secondary: 'bg-white text-forest border border-forest hover:bg-cream',
+    ghost: 'text-forest underline-offset-4 hover:underline',
+  }[kind];
+  return (
+    <button
+      type="button"
+      className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full font-bold transition disabled:cursor-not-allowed disabled:opacity-40 ${size} ${look} ${className}`}
+      {...props}
+    />
+  );
+}
+
+function Chip({ tone = 'neutral', children, className = '' }) {
+  const look = {
+    neutral: 'bg-white text-muted border border-line',
+    lime: 'bg-lime text-forest',
+    forest: 'bg-forest text-lime',
+    rust: 'bg-rust text-white',
+    low: 'bg-[var(--low-bg)] text-[var(--low-fg)]',
+    medium: 'bg-[var(--mid-bg)] text-[var(--mid-fg)]',
+    high: 'bg-[var(--high-bg)] text-[var(--high-fg)]',
+  }[tone];
+  return <span className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-bold ${look} ${className}`}>{children}</span>;
+}
+
+const RiskChip = ({ level }) => <Chip tone={level.toLowerCase()}>{level} risk</Chip>;
+
+function DaysBadge({ days }) {
+  return days >= 8
+    ? <Chip tone="rust" className="num">{plural(days, 'day')}</Chip>
+    : <Chip className="num">{plural(days, 'day')}</Chip>;
+}
+
+function SectionHead({ label, title, note, children }) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="min-w-0">
+        <p className="label">{label}</p>
+        <h2 className="mt-1 text-xl font-bold md:text-2xl">{title}</h2>
+        {note && <p className="mt-1 text-sm text-muted">{note}</p>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Picker({ id, label, value, onChange, options }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <label htmlFor={id} className="label">{label}</label>
+      <select
+        id={id}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="max-w-full rounded-full border border-forest bg-white px-4 py-2 text-sm font-bold text-forest"
+      >
+        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function Loading({ lines = 3 }) {
+  return (
+    <div className="grid gap-3" aria-busy="true" aria-label="Loading">
+      {Array.from({ length: lines }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-[13px] bg-cream" />)}
+    </div>
+  );
+}
+
+/* ---------- metrics strip (recruiter and client) ---------- */
+
+function MetricsStrip({ companyId, version }) {
+  const { data: m, loading } = useApi(() => api.getMetrics(companyId), [companyId, version]);
+  if (!m) return <Loading lines={1} />;
+  const tiles = [
+    { label: 'No update for 8+ days', value: m.noUpdate8, note: `of ${plural(m.openCount, 'open application')}`, warn: m.noUpdate8 > 0 },
+    { label: 'Closed with a clear outcome', value: `${m.clearPct}%`, note: `${m.clear} of ${plural(m.closed, 'closed application')}` },
+    { label: 'Accepted offers at risk', value: m.atRisk, note: `${m.high} high · ${m.offers} accepted in total`, warn: m.high > 0 },
+    { label: 'Messages this week', value: `${m.sent} / ${m.drafted}`, note: 'sent / drafted' },
+  ];
+  return (
+    <section aria-label="Key numbers" className={`fade grid grid-cols-2 gap-3 lg:grid-cols-4 ${loading ? 'is-loading' : ''}`}>
+      {tiles.map(t => (
+        <div key={t.label} className="tile min-w-0">
+          <p className="text-xs font-bold text-muted">{t.label}</p>
+          <p className={`num mt-1 text-3xl font-bold ${t.warn ? 'text-rust' : 'text-forest'}`}>{t.value}</p>
+          <p className="mt-0.5 text-xs text-muted">{t.note}</p>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+/* ---------- shared: pause a role ---------- */
+
+function PauseControl({ role, busy, run }) {
+  const [confirming, setConfirming] = useState(false);
+  if (role.status === 'paused') return <Chip tone="rust">Paused {role.pausedAt ? fmt(role.pausedAt) : ''}</Chip>;
+  if (!confirming) {
+    return <Btn small kind="secondary" disabled={!!busy} onClick={() => setConfirming(true)}>Pause role</Btn>;
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-[10px] bg-white p-2 pl-3">
+      <span className="text-sm">Pause and draft outcomes for {plural(role.activeCount, 'candidate')}?</span>
+      <Btn small onClick={() => {
+        setConfirming(false);
+        run('pause-' + role.id, () => api.pauseRole(role.id), r => `${role.title} paused. ${plural(r.drafted, 'outcome draft')} ready to approve.`);
+      }}>Pause role</Btn>
+      <Btn small kind="ghost" onClick={() => setConfirming(false)}>Cancel</Btn>
+    </div>
+  );
+}
+
+/* ================= CANDIDATE VIEW ================= */
+
+const STEP_LABEL = { done: 'Cleared', current: 'You are here', upcoming: 'Coming up' };
+
+function RoundTracker({ c }) {
+  const n = c.rounds.length;
+  const allDone = ['offer', 'accepted', 'joined'].includes(c.status);
+  const stopped = ['rejected', 'paused'].includes(c.status);
+  return (
+    <section className="card">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="label">Your interview rounds</p>
+        <p className="num text-sm font-bold">{allDone ? `All ${n} rounds cleared` : `Round ${c.round + 1} of ${n}`}</p>
+      </div>
+      <ol className="steps mt-4" style={{ '--n': n }}>
+        {c.rounds.map((name, i) => {
+          const state = allDone || i < c.round ? 'done' : i === c.round ? (stopped ? 'stopped' : 'current') : 'upcoming';
+          const label = state === 'stopped' ? (c.status === 'paused' ? 'Role paused here' : 'Ended here') : STEP_LABEL[state];
+          return (
+            <li key={name} className={`step step-${state}`} aria-current={state === 'current' ? 'step' : undefined}>
+              <span className="dot" aria-hidden="true">{state === 'done' ? '✓' : i + 1}</span>
+              <span className="min-w-0">
+                <span className="block text-sm font-bold leading-snug">{name}</span>
+                <span className={`block text-xs ${state === 'current' ? 'text-forest' : 'text-muted'}`}>{label}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+      {c.nextUpdate && (
+        <div className="mt-5 border-t border-line pt-4">
+          {c.nextUpdate.slipped ? (
+            <>
+              <p className="text-lg font-bold">Next update between {fmt(c.nextUpdate.from)} and {fmt(c.nextUpdate.to)}</p>
+              <p className="mt-1 text-sm text-muted">
+                We planned to update you by {fmt(c.nextUpdate.original)}. That date passed, so this range moves forward automatically until you hear from us.
+              </p>
+            </>
+          ) : (
+            <p className="text-lg font-bold">Next update by {fmtLong(c.nextUpdate.from)}</p>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function OutcomeCard({ c }) {
+  const n = c.rounds.length;
+  const content = {
+    paused: { chip: 'Role paused', title: 'This role is on hold', body: `${c.companyName} paused hiring for this role, so your application is closed for now. You reached ${c.roundName}, round ${c.round + 1} of ${n}.` },
+    rejected: { chip: 'Not selected', title: 'Not selected for this role', body: `${c.companyName} decided not to move forward after ${c.roundName}. Your saved test results still count when you apply for other Flexiple roles.` },
+    offer: { chip: 'Offer', title: `${c.companyName} has made you an offer`, body: `You cleared all ${n} rounds. Your recruiter will go through the offer with you.` },
+    accepted: c.offer && { chip: 'Offer accepted', title: `You join ${c.companyName} on ${fmtLong(c.offer.joiningDate)}`, body: `${plural(c.offer.daysLeft, 'day')} to go. Your recruiter stays in touch until Day 1.` },
+    joined: { chip: 'Joined', title: `You joined ${c.companyName}`, body: 'Your hiring process is complete.' },
+  }[c.status];
+  if (!content) return null;
+  return (
+    <section className="rounded-[13px] bg-forest p-5 text-cream md:p-6" aria-label="Application outcome">
+      <Chip tone="lime">{content.chip}</Chip>
+      <h3 className="mt-3 text-xl font-bold text-lime md:text-2xl">{content.title}</h3>
+      <p className="mt-1 max-w-2xl">{content.body}</p>
+    </section>
+  );
+}
+
+function MessageHistory({ messages }) {
+  return (
+    <section className="card min-w-0">
+      <p className="label">Updates you've received</p>
+      {messages.length === 0 ? (
+        <p className="mt-3 text-sm text-muted">No updates yet. Your first one arrives after your profile review.</p>
+      ) : (
+        <ol className="mt-4 grid gap-3">
+          {messages.map(m => (
+            <li key={m.id} className="rounded-[10px] border border-line bg-white p-4">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                <time className="font-bold">{fmtLong(m.at)}</time>
+                {m.channels.map(ch => <Chip key={ch}>{CHANNEL_LABEL[ch]}</Chip>)}
+              </div>
+              <p className="mt-2 text-sm leading-relaxed">{m.text}</p>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
+}
+
+function SavedTests({ tests }) {
+  return (
+    <section className="card min-w-0">
+      <p className="label">Saved test results</p>
+      <p className="mt-2 text-sm text-muted">
+        Tests you passed in the last 12 months. When you apply for another Flexiple role, you're only tested on the skills that role adds.
+      </p>
+      {tests.length === 0 ? (
+        <p className="mt-4 text-sm">No saved tests yet. Your Flexiple coding test appears here once you pass it.</p>
+      ) : (
+        <ul className="mt-4 grid gap-3">
+          {tests.map(t => (
+            <li key={t.name} className="rounded-[10px] border border-line bg-white p-4">
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-bold">{t.name}</p>
+                <p className="num font-bold">{t.score}</p>
+              </div>
+              <p className="mt-1 text-xs text-muted">Passed {fmtLong(t.passedAt)}</p>
+              <div className="mt-2"><Chip tone="low">Valid until {fmtLong(t.validUntil)}</Chip></div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function CandidateView({ version }) {
+  const [cid, setCid] = useState('k1');
+  const list = useApi(() => api.getCandidates(), [version]);
+  const { data: c, loading } = useApi(() => api.getCandidate(cid), [cid, version]);
+  return (
+    <div className="grid gap-8">
+      <Picker
+        id="candidate-picker"
+        label="Viewing as"
+        value={cid}
+        onChange={setCid}
+        options={(list.data || [{ id: cid, name: 'Loading…', roleTitle: '' }]).map(x => ({ value: x.id, label: x.roleTitle ? `${x.name} · ${x.roleTitle}` : x.name }))}
+      />
+      {!c ? <Loading /> : (
+        <div className={`fade grid gap-6 ${loading ? 'is-loading' : ''}`}>
+          <div>
+            <p className="label">Your application</p>
+            <h2 className="mt-1 text-2xl font-bold md:text-3xl">{c.roleTitle}</h2>
+            <p className="mt-1 text-muted">{c.companyName} · Your recruiter: Priya Raman</p>
+          </div>
+          {c.status !== 'active' && <OutcomeCard c={c} />}
+          <RoundTracker c={c} />
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+            <MessageHistory messages={c.messages} />
+            <SavedTests tests={c.tests} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ================= RECRUITER VIEW ================= */
+
+function Alerts({ version, busy, run }) {
+  const { data, loading } = useApi(() => api.getAlerts(7), [version]);
+  return (
+    <section className="min-w-0">
+      <SectionHead label="Alerts" title="No update for 7+ days" note={data ? `${plural(data.length, 'candidate')}, longest wait first` : ' '} />
+      {!data ? <div className="mt-4"><Loading /></div> : data.length === 0 ? (
+        <p className="tile mt-4 text-sm">Everyone has heard from you in the last week.</p>
+      ) : (
+        <ul className={`fade mt-4 grid gap-2 ${loading ? 'is-loading' : ''}`}>
+          {data.map(c => (
+            <li key={c.id} className="tile flex flex-wrap items-center gap-x-3 gap-y-2">
+              <div className="min-w-0 flex-1 basis-48">
+                <p className="truncate font-bold">{c.name}</p>
+                <p className="truncate text-xs text-muted">{c.roleTitle} · {c.companyName}</p>
+                <p className="text-xs text-muted">{c.roundName} · round {c.round + 1} of {c.rounds.length}</p>
+              </div>
+              <DaysBadge days={c.daysWaiting} />
+              {c.pendingDraft
+                ? <Chip tone="lime">Draft ready</Chip>
+                : <Btn small kind="secondary" disabled={!!busy} onClick={() => run('alert-' + c.id, () => api.draftMessage(c.id, 'check_in'), `Draft ready for ${c.name}`)}>Draft update</Btn>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function DraftCard({ d, busy, run }) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(d.text);
+  const [channels, setChannels] = useState(d.channels);
+  useEffect(() => { if (!editing) setText(d.text); }, [d.text, editing]);
+
+  const toggle = ch => {
+    const next = channels.includes(ch) ? channels.filter(x => x !== ch) : CHANNELS.filter(x => x === ch || channels.includes(x));
+    if (next.length) setChannels(next);
+  };
+  const first = d.candidateName.split(' ')[0];
+
+  return (
+    <article className="card">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="label">{d.eventLabel}</p>
+          <h3 className="mt-1 font-bold">{d.candidateName}</h3>
+          <p className="text-xs text-muted">{d.roleTitle} · {d.companyName} · drafted {hoursAgo(d.createdAt)}</p>
+        </div>
+        <Chip tone="forest">AI draft from pipeline facts</Chip>
+      </div>
+
+      {editing ? (
+        <textarea
+          id={`draft-text-${d.id}`}
+          aria-label={`Message to ${d.candidateName}`}
+          className="mt-3 w-full rounded-[10px] border border-forest bg-white p-3 text-sm leading-relaxed text-forest"
+          rows={5}
+          value={text}
+          onChange={e => setText(e.target.value)}
+        />
+      ) : (
+        <p className="mt-3 rounded-[10px] border border-line bg-white p-3 text-sm leading-relaxed">{text}</p>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold text-muted">Send via</span>
+        {CHANNELS.map(ch => {
+          const on = channels.includes(ch);
+          return (
+            <button
+              key={ch}
+              type="button"
+              aria-pressed={on}
+              onClick={() => toggle(ch)}
+              className={`rounded-full border px-3 py-1 text-xs font-bold transition ${on ? 'border-forest bg-forest text-lime' : 'border-line bg-white text-muted'}`}
+            >
+              {on ? '✓ ' : ''}{CHANNEL_LABEL[ch]}
+            </button>
+          );
+        })}
+      </div>
+
+      {d.guard.blocked ? (
+        <p className="mt-3 rounded-[10px] bg-[var(--high-bg)] p-3 text-sm text-[var(--high-fg)]">
+          <b>Can't send yet.</b> {d.guard.reason}
+        </p>
+      ) : (
+        <p className="mt-3 text-xs text-muted">{d.guard.sentThisWeek} of 2 weekly messages used for {first} on this role.</p>
+      )}
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <Btn
+          disabled={d.guard.blocked || !!busy || !text.trim()}
+          onClick={() => run('approve-' + d.id, () => api.approveMessage(d.id, { text, channels }), `Sent to ${d.candidateName} by ${channels.map(ch => CHANNEL_LABEL[ch]).join(', ')}`)}
+        >
+          {busy === 'approve-' + d.id ? 'Sending…' : 'Approve and send'}
+        </Btn>
+        {editing ? (
+          <Btn kind="secondary" disabled={!!busy || !text.trim()} onClick={() => { setEditing(false); run('edit-' + d.id, () => api.editDraft(d.id, { text, channels }), 'Draft saved'); }}>Save edit</Btn>
+        ) : (
+          <Btn kind="secondary" disabled={!!busy} onClick={() => setEditing(true)}>Edit</Btn>
+        )}
+        <Btn kind="ghost" disabled={!!busy} onClick={() => run('discard-' + d.id, () => api.discardDraft(d.id), 'Draft discarded')}>Discard</Btn>
+      </div>
+    </article>
+  );
+}
+
+function Drafts({ version, busy, run }) {
+  const { data, loading } = useApi(() => api.getDrafts(), [version]);
+  return (
+    <section className="min-w-0">
+      <SectionHead label="AI update writer" title="Drafts to approve" note="Nothing goes to a candidate until you approve it." />
+      {!data ? <div className="mt-4"><Loading /></div> : data.length === 0 ? (
+        <p className="tile mt-4 text-sm">No drafts waiting. Moving a candidate or pausing a role creates one.</p>
+      ) : (
+        <div className={`fade mt-4 grid gap-4 ${loading ? 'is-loading' : ''}`}>
+          {data.map(d => <DraftCard key={d.id} d={d} busy={busy} run={run} />)}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Pipeline({ version, busy, run }) {
+  const [rid, setRid] = useState('r1');
+  const roles = useApi(() => api.getRoles(), [version]);
+  const cands = useApi(() => api.getCandidates({ roleId: rid }), [rid, version]);
+  const role = roles.data && roles.data.find(r => r.id === rid);
+
+  return (
+    <section>
+      <SectionHead label="Pipeline" title="Move candidates through rounds" note="Every move drafts an update for the candidate." />
+      <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Roles">
+        {(roles.data || []).map(r => (
+          <button
+            key={r.id}
+            type="button"
+            role="tab"
+            aria-selected={r.id === rid}
+            onClick={() => setRid(r.id)}
+            className={`shrink-0 rounded-full border px-4 py-2 text-left text-xs font-bold transition ${r.id === rid ? 'border-forest bg-forest text-lime' : 'border-line bg-white text-forest hover:border-forest'}`}
+          >
+            {r.title}<span className={r.id === rid ? 'text-cream' : 'text-muted'}> · {r.companyName}</span>
+          </button>
+        ))}
+      </div>
+
+      {role && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[13px] bg-cream p-4">
+          <div className="min-w-0">
+            <p className="font-bold">{role.title}</p>
+            <p className="text-xs text-muted">{role.companyName} · {plural(role.rounds.length, 'round')} · {plural(role.activeCount, 'candidate')} in process</p>
+          </div>
+          <PauseControl role={role} busy={busy} run={run} />
+        </div>
+      )}
+
+      {!cands.data ? <div className="mt-4"><Loading /></div> : (
+        <div className={`fade table-wrap mt-4 ${cands.loading ? 'is-loading' : ''}`}>
+          <table>
+            <thead>
+              <tr><th>Candidate</th><th>Current round</th><th>Last update</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {cands.data.map(c => {
+                const last = c.round === c.rounds.length - 1;
+                const active = c.status === 'active';
+                return (
+                  <tr key={c.id}>
+                    <td><p className="font-bold">{c.name}</p><p className="text-xs text-muted">{c.city}</p></td>
+                    <td><p>{c.roundName}</p><p className="num text-xs text-muted">round {c.round + 1} of {c.rounds.length}</p></td>
+                    <td>{active ? <DaysBadge days={c.daysWaiting} /> : <span className="text-xs text-muted">{ago(c.daysWaiting)}</span>}</td>
+                    <td><Chip tone={active ? 'neutral' : c.status === 'paused' || c.status === 'rejected' ? 'medium' : 'low'}>{STATUS_LABEL[c.status]}</Chip></td>
+                    <td>
+                      {active ? (
+                        <div className="flex flex-wrap gap-2">
+                          {last ? (
+                            <Btn small disabled={!!busy} onClick={() => run('offer-' + c.id, () => api.makeOffer(c.id), `Offer recorded for ${c.name}. Draft ready.`)}>Make offer</Btn>
+                          ) : (
+                            <Btn small disabled={!!busy} onClick={() => run('move-' + c.id, () => api.updateStage(c.id), `${c.name} moved to ${c.rounds[c.round + 1]}. Draft ready.`)}>
+                              {busy === 'move-' + c.id ? 'Moving…' : 'Move to next round'}
+                            </Btn>
+                          )}
+                          <Btn small kind="ghost" disabled={!!busy} onClick={() => run('reject-' + c.id, () => api.markNotSelected(c.id), `${c.name} marked not selected. Draft ready.`)}>Not selected</Btn>
+                        </div>
+                      ) : <span className="text-xs text-muted">No actions</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function RecruiterView({ version, bump, notify }) {
+  const [busy, run] = useRunner(bump, notify);
+  return (
+    <div className="grid gap-10">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-muted">Signed in as <b className="text-forest">Priya Raman</b>, Flexiple recruiter</p>
+      </div>
+      <MetricsStrip version={version} />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-8">
+        <Alerts version={version} busy={busy} run={run} />
+        <Drafts version={version} busy={busy} run={run} />
+      </div>
+      <Pipeline version={version} busy={busy} run={run} />
+    </div>
+  );
+}
+
+/* ================= CLIENT VIEW ================= */
+
+function HiringBoard({ companyId, version, busy, run }) {
+  const { data, loading } = useApi(() => api.getRoles(companyId), [companyId, version]);
+  return (
+    <section>
+      <SectionHead label="Hiring board" title="Your open roles" note="Candidates in each round, and how long since anyone moved." />
+      {!data ? <div className="mt-4"><Loading /></div> : (
+        <div className={`fade mt-4 grid gap-4 md:grid-cols-2 ${loading ? 'is-loading' : ''}`}>
+          {data.map(r => (
+            <article key={r.id} className="card flex flex-col">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold leading-snug">{r.title}</h3>
+                  <p className="text-xs text-muted">
+                    {plural(r.activeCount, 'candidate')} in process · last movement {r.daysSinceMove === null ? 'none yet' : ago(r.daysSinceMove)}
+                  </p>
+                </div>
+                {r.status === 'paused' ? <Chip tone="rust">Paused</Chip> : <Chip tone="lime">Open</Chip>}
+              </div>
+              <ol className="mt-4 grid gap-1.5">
+                {r.rounds.map((name, i) => {
+                  const count = r.stageCounts[i];
+                  return (
+                    <li key={name} className="flex items-center justify-between gap-3 rounded-[8px] border border-line bg-white px-3 py-2 text-sm">
+                      <span className="min-w-0 truncate"><span className="num mr-2 text-muted">{i + 1}</span>{name}</span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        {count > 0 && <span className={`num text-xs ${r.stageLongestWait[i] >= 8 ? 'font-bold text-rust' : 'text-muted'}`}>{r.stageLongestWait[i]}d</span>}
+                        <span className={`num grid h-6 min-w-6 place-items-center rounded-full px-2 text-xs font-bold ${count ? 'bg-lime text-forest' : 'text-muted'}`}>{count}</span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs text-muted">{r.offerCount ? `${plural(r.offerCount, 'offer')} accepted or out` : 'No offers yet'}</p>
+                <PauseControl role={r} busy={busy} run={run} />
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function OffersTable({ companyId, version, busy, run }) {
+  const { data, loading } = useApi(() => api.getOffers(companyId), [companyId, version]);
+  const [openBackup, setOpenBackup] = useState(null);
+  return (
+    <section>
+      <SectionHead label="Offer-to-join tracker" title="Accepted offers" note="Risk comes only from process signals. Only you and your Flexiple recruiter can see it; candidates never do." />
+      {!data ? <div className="mt-4"><Loading /></div> : data.length === 0 ? (
+        <p className="tile mt-4 text-sm">No accepted offers yet.</p>
+      ) : (
+        <div className={`fade table-wrap mt-4 ${loading ? 'is-loading' : ''}`}>
+          <table>
+            <thead>
+              <tr><th>Hire</th><th>Joining date</th><th>Notice left</th><th>Last contact</th><th>Risk</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {data.map(o => (
+                <React.Fragment key={o.candidateId}>
+                  <tr>
+                    <td><p className="font-bold">{o.candidateName}</p><p className="text-xs text-muted">{o.roleTitle}</p></td>
+                    <td>
+                      <p className="num">{fmtLong(o.joiningDate)}</p>
+                      {o.joiningDate > o.originalJoiningDate && <p className="text-xs font-bold text-rust">Moved from {fmt(o.originalJoiningDate)}</p>}
+                    </td>
+                    <td><p className="num font-bold">{plural(o.daysLeft, 'day')}</p><p className="text-xs text-muted">of a {o.noticeDays}-day notice</p></td>
+                    <td><p className="num">{fmt(o.lastContactAt)}</p><p className="text-xs text-muted">last reply {fmt(o.lastReplyAt)}</p></td>
+                    <td>
+                      <RiskChip level={o.risk.level} />
+                      {o.risk.signals.length ? (
+                        <ul className="mt-1.5 grid gap-0.5 text-xs text-muted">{o.risk.signals.map(s => <li key={s}>{s}</li>)}</ul>
+                      ) : <p className="mt-1.5 text-xs text-muted">No warning signals</p>}
+                    </td>
+                    <td>
+                      <div className="flex flex-col items-start gap-2">
+                        <Btn small kind="secondary" disabled={!!busy} onClick={() => run('missed-' + o.candidateId, () => api.markMissedCheckin(o.candidateId), r => `Missed check-in logged for ${o.candidateName}. Risk is now ${r.risk.level}.`)}>
+                          {busy === 'missed-' + o.candidateId ? 'Logging…' : 'Log missed check-in'}
+                        </Btn>
+                        {o.risk.level === 'High' && o.runnerUp && (
+                          <button
+                            type="button"
+                            aria-expanded={openBackup === o.candidateId}
+                            onClick={() => setOpenBackup(openBackup === o.candidateId ? null : o.candidateId)}
+                            className="rounded-full bg-lime px-3 py-1 text-xs font-bold text-forest"
+                          >
+                            Backup ready: {o.runnerUp.name} {openBackup === o.candidateId ? '▴' : '▾'}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                  {openBackup === o.candidateId && o.runnerUp && (
+                    <tr>
+                      <td colSpan={6} className="bg-cream">
+                        <p className="label">Runner-up for this role</p>
+                        <p className="mt-1">
+                          <b>{o.runnerUp.name}</b> ({o.runnerUp.city}) is at {o.runnerUp.roundName}, round {o.runnerUp.round + 1} of {o.runnerUp.rounds.length}.
+                          {' '}Status: {STATUS_LABEL[o.runnerUp.status].toLowerCase()}. Last update {ago(o.runnerUp.daysWaiting)}.
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ClientView({ version, bump, notify }) {
+  const [companyId, setCompanyId] = useState('c1');
+  const ctx = useApi(() => api.getContext(), []);
+  const [busy, run] = useRunner(bump, notify);
+  const co = ctx.data && ctx.data.companies.find(c => c.id === companyId);
+  return (
+    <div className="grid gap-10">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Picker
+          id="company-picker"
+          label="Company"
+          value={companyId}
+          onChange={setCompanyId}
+          options={(ctx.data ? ctx.data.companies : [{ id: 'c1', name: 'Loading…' }]).map(c => ({ value: c.id, label: c.name }))}
+        />
+        {co && <p className="text-sm text-muted">Signed in as <b className="text-forest">{co.hrLead}</b>, {co.hrTitle} · {co.blurb}</p>}
+      </div>
+      <MetricsStrip companyId={companyId} version={version} />
+      <HiringBoard companyId={companyId} version={version} busy={busy} run={run} />
+      <OffersTable companyId={companyId} version={version} busy={busy} run={run} />
+    </div>
+  );
+}
+
+/* ================= APP SHELL ================= */
+
+const VIEWS = [
+  ['candidate', 'Candidate view', 'Candidate'],
+  ['client', 'Client view', 'Client'],
+  ['recruiter', 'Recruiter view', 'Recruiter'],
+];
+const VIEW_INTRO = {
+  candidate: 'Where your application stands, round by round, and when you will hear next.',
+  client: 'Every role and every hire in one place, from first interview to joining day.',
+  recruiter: 'Who is waiting for news, and the updates ready for you to approve.',
+};
+
+function App() {
+  const fromHash = location.hash.slice(1);
+  const [view, setView] = useState(VIEWS.some(v => v[0] === fromHash) ? fromHash : 'candidate');
+  const [version, setVersion] = useState(0);
+  const [toast, setToast] = useState(null);
+  const bump = useCallback(() => setVersion(v => v + 1), []);
+  const notify = useCallback((text, tone = 'ok') => setToast({ text, tone, key: Date.now() }), []);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), toast.tone === 'error' ? 7000 : 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const go = v => {
+    setView(v);
+    try { history.replaceState(null, '', '#' + v); } catch (e) { /* the frame may refuse; the view still switches */ }
+    window.scrollTo({ top: 0 });
+  };
+
+  const reset = async () => {
+    await api.resetDemo();
+    bump();
+    notify('Demo data reset');
+  };
+
+  const props = { version, bump, notify };
+  return (
+    <>
+      <header className="site-header bg-forest">
+        <div className="gutter mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 py-3">
+          <p className="flex items-baseline gap-2">
+            <span className="text-xl font-bold tracking-tight text-lime">flexiple</span>
+            <span className="text-sm text-cream">Hiring Hub</span>
+          </p>
+          <div role="tablist" aria-label="Switch view" className="flex rounded-full bg-white/10 p-1">
+            {VIEWS.map(([key, long, short]) => (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={view === key}
+                onClick={() => go(key)}
+                className={`rounded-full px-3 py-1.5 text-sm font-bold transition sm:px-4 ${view === key ? 'bg-lime text-forest' : 'text-cream hover:text-white'}`}
+              >
+                <span className="sm:hidden">{short}</span>
+                <span className="hidden sm:inline">{long}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <section className="bg-forest">
+        <div className="gutter mx-auto max-w-6xl pb-8 pt-4 md:pb-12 md:pt-8">
+          <h1 className="max-w-3xl text-3xl font-bold leading-tight text-cream md:text-5xl">
+            Hiring Hub: <span className="text-lime">no silence from interview to Day&nbsp;1</span>
+          </h1>
+          <p className="mt-3 max-w-2xl text-cream/80">{VIEW_INTRO[view]}</p>
+        </div>
+      </section>
+
+      <main className="gutter mx-auto max-w-6xl py-8 md:py-12">
+        {view === 'candidate' && <CandidateView {...props} />}
+        {view === 'client' && <ClientView {...props} />}
+        {view === 'recruiter' && <RecruiterView {...props} />}
+      </main>
+
+      <footer className="border-t border-line">
+        <div className="gutter mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 py-6 text-xs text-muted">
+          <p>Prototype with sample data and a simulated API. No messages are really sent.</p>
+          <Btn small kind="secondary" onClick={reset}>Reset demo data</Btn>
+        </div>
+      </footer>
+
+      <div aria-live="polite">
+        {toast && (
+          <div key={toast.key} role="status" className={`toast rounded-[13px] px-4 py-3 text-sm font-bold shadow-lg ${toast.tone === 'error' ? 'bg-rust text-white' : 'bg-forest text-lime'}`}>
+            {toast.text}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>
