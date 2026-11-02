@@ -204,13 +204,14 @@ const ICONS = {
   userCheck: ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'c:9,7,4', 'm16 11 2 2 4-4'],
   bell: ['M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9', 'M10.3 21a1.94 1.94 0 0 0 3.4 0'],
   info: ['c:12,12,10', 'M12 16v-4', 'M12 8h.01'],
+  target: ['c:12,12,10', 'c:12,12,6', 'c:12,12,2'],
 };
 
 function Icon({ name, size = 16, className = '', strokeWidth = 2 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth}
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={`shrink-0 ${className}`}>
-      {ICONS[name].map((d, i) => {
+      {(ICONS[name] || ICONS.info).map((d, i) => {
         if (d.startsWith('c:')) { const [cx, cy, r] = d.slice(2).split(','); return <circle key={i} cx={cx} cy={cy} r={r} />; }
         if (d.startsWith('r:')) { const [x, y, w, h, rx] = d.slice(2).split(','); return <rect key={i} x={x} y={y} width={w} height={h} rx={rx} />; }
         return <path key={i} d={d} />;
@@ -559,11 +560,13 @@ function CandidateView({ version, cid }) {
   if (!c) return <Skeleton lines={3} height={140} />;
   return (
     <div className={`fade grid gap-5 ${loading ? 'is-loading' : ''}`}>
-      {c.status !== 'active' && <OutcomeCard c={c} />}
-      <ApplicationCard c={c} />
+      <div id="sec-application" className="grid scroll-mt-40 gap-5">
+        {c.status !== 'active' && <OutcomeCard c={c} />}
+        <ApplicationCard c={c} />
+      </div>
       <div className="grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <MessageHistory messages={c.messages} />
-        <SavedTests tests={c.tests} />
+        <div id="sec-updates" className="scroll-mt-40"><MessageHistory messages={c.messages} /></div>
+        <div id="sec-tests" className="scroll-mt-40"><SavedTests tests={c.tests} /></div>
       </div>
     </div>
   );
@@ -853,15 +856,13 @@ function RecruiterView({ version, bump, notify }) {
       <PageHead title="Recruiter overview" stats={m.data && <>
         <DotStat tone="good">In process {m.data.openCount}</DotStat>
         <DotStat tone="bad">Waiting 8+ days {m.data.noUpdate8}</DotStat>
-      </>}>
-        <Btn kind="soft" icon="inbox" onClick={() => document.getElementById('drafts')?.scrollIntoView({ behavior: 'smooth' })}>Go to drafts</Btn>
-      </PageHead>
-      <MetricsStrip version={version} />
+      </>} />
+      <div id="sec-numbers" className="scroll-mt-40"><MetricsStrip version={version} /></div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-        <Alerts version={version} busy={busy} run={run} />
-        <Drafts version={version} bump={bump} notify={notify} />
+        <div id="sec-waiting" className="scroll-mt-40"><Alerts version={version} busy={busy} run={run} /></div>
+        <div id="sec-drafts" className="scroll-mt-40"><Drafts version={version} bump={bump} notify={notify} /></div>
       </div>
-      <Pipeline version={version} busy={busy} run={run} />
+      <div id="sec-pipeline" className="scroll-mt-40"><Pipeline version={version} busy={busy} run={run} /></div>
     </div>
   );
 }
@@ -1057,14 +1058,78 @@ function ClientView({ version, bump, notify, companyId, company }) {
         <DotStat tone="good">In process {m.data.openCount}</DotStat>
         <DotStat tone="bad">Offers at risk {m.data.atRisk}</DotStat>
       </>} />
-      <MetricsStrip companyId={companyId} version={version} />
-      <OffersTable companyId={companyId} version={version} busy={busy} run={run} />
-      <HiringBoard companyId={companyId} version={version} busy={busy} run={run} />
+      <div id="sec-numbers" className="scroll-mt-40"><MetricsStrip companyId={companyId} version={version} /></div>
+      <div id="sec-offers" className="scroll-mt-40"><OffersTable companyId={companyId} version={version} busy={busy} run={run} /></div>
+      <div id="sec-roles" className="scroll-mt-40"><HiringBoard companyId={companyId} version={version} busy={busy} run={run} /></div>
     </div>
   );
 }
 
 /* ================= APP SHELL ================= */
+
+// Full-width green stripe of icon + label tabs that jump to sections of the current view.
+const SECTIONS = {
+  candidate: () => [
+    { id: 'sec-application', label: 'Application', icon: 'briefcase' },
+    { id: 'sec-updates', label: 'Updates', icon: 'chat' },
+    { id: 'sec-tests', label: 'Saved tests', icon: 'award' },
+  ],
+  client: () => [
+    { id: 'sec-numbers', label: 'Key numbers', icon: 'target' },
+    { id: 'sec-offers', label: 'Offer-to-join', icon: 'userCheck' },
+    { id: 'sec-roles', label: 'Roles', icon: 'briefcase' },
+  ],
+  recruiter: pending => [
+    { id: 'sec-numbers', label: 'Key numbers', icon: 'target' },
+    { id: 'sec-waiting', label: 'Waiting for news', icon: 'clock' },
+    { id: 'sec-drafts', label: 'Drafts', icon: 'inbox', count: pending },
+    { id: 'sec-pipeline', label: 'Pipeline', icon: 'users' },
+  ],
+};
+
+function SectionBand({ items }) {
+  const [active, setActive] = useState(items[0].id);
+  const ids = items.map(i => i.id).join();
+  useEffect(() => {
+    const onScroll = () => {
+      let cur = items[0].id;
+      for (const it of items) {
+        const el = document.getElementById(it.id);
+        if (el && el.getBoundingClientRect().top <= 200) cur = it.id;
+      }
+      // At the very bottom the last sections can't reach the top, so treat the last one as active.
+      if (window.scrollY > 0 && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = items[items.length - 1].id;
+      setActive(cur);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [ids]);
+  const go = id => {
+    setActive(id);
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById(id)?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+  };
+  return (
+    <nav className="border-t border-white/10 bg-accent" aria-label="Sections on this page">
+      <div className="flex overflow-x-auto">
+        {items.map((it, i) => {
+          const on = it.id === active;
+          return (
+            <button key={it.id} type="button" aria-current={on ? 'true' : undefined} onClick={() => go(it.id)}
+              className={`relative flex min-w-[100px] flex-1 flex-col items-center justify-center gap-1 px-3 py-3 text-xs font-bold transition ${i ? 'border-l border-white/10' : ''} ${on ? 'bg-lime text-accent' : 'text-cream/80 hover:bg-white/10 hover:text-white'}`}>
+              <Icon name={it.icon} size={20} />
+              <span className="whitespace-nowrap">{it.label}</span>
+              {it.count > 0 && (
+                <span className={`num absolute right-2 top-1.5 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] ${on ? 'bg-accent text-lime' : 'bg-bad text-white'}`}>{it.count}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
 
 const VIEWS = [
   { key: 'candidate', label: 'Candidate view', short: 'Candidate', icon: 'user' },
@@ -1211,7 +1276,9 @@ function App() {
           <div className="gutter flex gap-1 overflow-x-auto border-t border-white/10 py-2 lg:hidden" role="tablist" aria-label="Switch view">
             {VIEWS.map(v => navItem(v, true))}
           </div>
+          <div className="hidden lg:block"><SectionBand key={view} items={SECTIONS[view](pending)} /></div>
         </header>
+        <div className="lg:hidden"><SectionBand key={view} items={SECTIONS[view](pending)} /></div>
 
         <main className="gutter py-6 md:py-8">
           <div className="mb-6 lg:hidden">
