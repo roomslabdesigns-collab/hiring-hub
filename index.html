@@ -1064,11 +1064,6 @@ const VIEWS = [
   { key: 'client', label: 'Client', icon: 'building' },
   { key: 'recruiter', label: 'Recruiter', icon: 'briefcase' },
 ];
-const VIEW_INTRO = {
-  candidate: 'Where your application stands and when you will hear next.',
-  client: 'Every hire from first interview to joining day.',
-  recruiter: 'Who is waiting for news, and the updates ready to approve.',
-};
 
 function App() {
   const fromHash = location.hash.slice(1);
@@ -1137,9 +1132,8 @@ function App() {
         <div className="gutter mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-x-8 gap-y-5 pb-8 pt-6 md:pb-10 md:pt-8">
           <div className="min-w-0 max-w-xl">
             <h1 className="text-[28px] font-bold leading-[1.1] tracking-[-0.025em] text-cream md:text-[36px]" style={{ textWrap: 'balance' }}>
-              Hiring Hub: <span className="text-lime">no silence from interview to Day&nbsp;1</span>
+              Hiring <span className="text-lime">Hub</span>
             </h1>
-            <p className="mt-2 text-[15px] text-cream/80">{VIEW_INTRO[view]}</p>
           </div>
           {view === 'candidate' && (
             <HeroPicker id="candidate-picker" label="Viewing as" value={cid} onChange={setCid}
