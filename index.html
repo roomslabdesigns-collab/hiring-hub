@@ -48,8 +48,8 @@
 
   /* Card: white top, grey details panel underneath */
   .card { background: linear-gradient(180deg, #FFFFFF 0%, #FBFDFB 100%); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
-  .card-top { padding: 20px; }
-  .card-panel { background: var(--panel); padding: 20px; }
+  .card-top { padding: 16px 20px; }
+  .card-panel { background: var(--panel); padding: 14px 20px; }
   .kv dt { font-size: 13px; color: var(--sub); }
   .kv dd { margin: 2px 0 0; font-size: 15px; font-weight: 700; color: var(--ink); }
 
@@ -60,26 +60,8 @@
   .skeleton { background: linear-gradient(90deg, #E2EAE4 0%, #EDF2EE 50%, #E2EAE4 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
   @keyframes shimmer { to { background-position: -200% 0; } }
 
-  /* Round tracker */
-  .track { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-  .track li { position: relative; display: flex; gap: 12px; padding-bottom: 20px; min-width: 0; }
-  .track li:last-child { padding-bottom: 0; }
-  .track li:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: 32px; bottom: 4px; width: 2px; border-radius: 2px; background: var(--line); }
-  .track li.done:not(:last-child)::after { background: var(--accent); }
-  .track .dot { flex: none; width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--white); border: 2px solid var(--line); color: var(--sub); position: relative; z-index: 1; }
-  .track .done .dot { background: var(--accent); border-color: var(--accent); color: var(--lime); }
-  .track .current .dot { background: var(--lime); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 5px rgba(207, 240, 125, .45); }
-  .track .stopped .dot { background: var(--bad); border-color: var(--bad); color: var(--white); }
-  .track .upcoming .name { color: var(--sub); }
-  .track .current .name, .track .done .name { font-weight: 700; }
-  @media (min-width: 900px) {
-    .track { flex-direction: row; }
-    .track li { flex: 1 1 0; flex-direction: column; padding-bottom: 0; padding-right: 8px; }
-    .track li:not(:last-child)::after { left: 36px; right: 4px; top: 13px; bottom: auto; width: auto; height: 2px; }
-  }
-
   .timeline { list-style: none; margin: 0; padding: 0; }
-  .timeline li { position: relative; padding-left: 36px; padding-bottom: 20px; }
+  .timeline li { position: relative; padding-left: 36px; padding-bottom: 14px; }
   .timeline li:last-child { padding-bottom: 0; }
   .timeline li:not(:last-child)::before { content: ""; position: absolute; left: 11px; top: 28px; bottom: 4px; width: 2px; background: var(--line); border-radius: 2px; }
   .timeline .tdot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: var(--panel); color: var(--sub); }
@@ -377,25 +359,25 @@ function Empty({ icon, title, body }) {
 
 function MetricsStrip({ companyId, version }) {
   const { data: m, loading } = useApi(() => api.getMetrics(companyId), [companyId, version]);
-  if (!m) return <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[0, 1, 2, 3].map(i => <div key={i} className="skeleton h-[118px]" />)}</div>;
+  if (!m) return <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[0, 1, 2, 3].map(i => <div key={i} className="skeleton h-[76px]" />)}</div>;
   const tiles = [
-    { icon: 'clock', label: 'No update for 8+ days', value: m.noUpdate8, note: `of ${plural(m.openCount, 'open application')}`, warn: m.noUpdate8 > 0 },
-    { icon: 'flag', label: 'Closed with clear outcome', value: `${m.clearPct}%`, note: `${m.clear} of ${m.closed} closed`, bar: m.clearPct },
-    { icon: 'shield', label: 'Accepted offers at risk', value: m.atRisk, note: `${m.high} high · ${m.offers} accepted`, warn: m.high > 0 },
+    { icon: 'clock', label: 'No update for 8+ days', value: m.noUpdate8, note: `of ${m.openCount} open`, warn: m.noUpdate8 > 0 },
+    { icon: 'flag', label: 'Closed with clear outcome', value: `${m.clearPct}%`, note: `${m.clear} of ${m.closed}` },
+    { icon: 'shield', label: 'Accepted offers at risk', value: m.atRisk, note: `${m.high} high · ${m.offers} total`, warn: m.high > 0 },
     { icon: 'send', label: 'Sent this week', value: m.sent, note: `of ${plural(m.drafted, 'draft')}` },
   ];
   return (
-    <section aria-label="Key numbers" className={`fade grid grid-cols-2 gap-4 lg:grid-cols-4 ${loading ? 'is-loading' : ''}`}>
+    <section aria-label="Key numbers" className={`fade grid grid-cols-2 gap-3 lg:grid-cols-4 ${loading ? 'is-loading' : ''}`}>
       {tiles.map(t => (
-        <div key={t.label} className="card p-4 md:p-5">
-          <div className="flex items-start justify-between gap-2">
+        <div key={t.label} className="card flex items-center gap-3 p-3.5 md:p-4">
+          <span className={`hidden h-10 w-10 shrink-0 place-items-center rounded-full sm:grid ${t.warn ? 'bg-[var(--bad-tint)] text-bad' : 'bg-tint text-accent'}`}><Icon name={t.icon} size={18} /></span>
+          <div className="min-w-0">
             <p className="text-[13px] leading-tight text-sub">{t.label}</p>
-            <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${t.warn ? 'bg-[var(--bad-tint)] text-bad' : 'bg-tint text-accent'}`}><Icon name={t.icon} size={16} /></span>
+            <p className="mt-1 flex flex-wrap items-baseline gap-x-2">
+              <span className={`num text-2xl font-bold leading-none ${t.warn ? 'text-bad' : 'text-ink'}`}>{t.value}</span>
+              <span className="text-xs text-sub">{t.note}</span>
+            </p>
           </div>
-          <p className={`num mt-2 text-2xl font-bold leading-none ${t.warn ? 'text-bad' : 'text-ink'}`}>{t.value}</p>
-          {t.bar !== undefined
-            ? <div className="mt-3 flex items-center gap-2"><div className="bar flex-1"><span style={{ width: `${t.bar}%` }} /></div><span className="whitespace-nowrap text-[13px] text-sub">{t.note}</span></div>
-            : <p className="mt-2 text-[13px] text-sub">{t.note}</p>}
         </div>
       ))}
     </section>
@@ -422,28 +404,68 @@ function PauseControl({ role, busy, run }) {
 
 /* ================= CANDIDATE VIEW ================= */
 
-function StatusCard({ c }) {
+const SEGMENT = { done: 'bg-accent', current: 'bg-lime ring-1 ring-accent', stopped: 'bg-bad', upcoming: 'bg-line' };
+const PILL = {
+  done: 'bg-tint text-accent font-bold',
+  current: 'bg-lime text-accent font-bold ring-1 ring-[#B4D95C]',
+  stopped: 'bg-[var(--bad-tint)] text-[#B91C1C] font-bold',
+  upcoming: 'border border-line bg-white text-sub',
+};
+
+// Application status, interview progress and next update in one card.
+function ApplicationCard({ c }) {
+  const n = c.rounds.length;
+  const allDone = ['offer', 'accepted', 'joined'].includes(c.status);
+  const stopped = ['rejected', 'paused'].includes(c.status);
+  const cleared = allDone ? n : c.round;
+  const toGo = allDone ? 0 : n - c.round - (stopped ? 0 : 1);
   const nu = c.nextUpdate;
+  const stateOf = i => (allDone || i < c.round ? 'done' : i === c.round ? (stopped ? 'stopped' : 'current') : 'upcoming');
   return (
     <section className="card">
-      <div className="card-top flex flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-4">
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-tint text-accent"><Icon name="briefcase" size={24} /></span>
-          <div className="min-w-0">
-            <h3 className="text-lg font-bold leading-snug">{c.roleTitle}</h3>
-            <p className="text-[13px] text-sub">{c.companyName}</p>
+      <div className="card-top grid gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-tint text-accent"><Icon name="briefcase" size={20} /></span>
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold leading-snug">{c.roleTitle}</h3>
+              <p className="text-[13px] text-sub">{c.companyName}</p>
+            </div>
           </div>
+          <Chip tone={STATUS[c.status].tone}>{STATUS[c.status].label}</Chip>
         </div>
-        <Chip tone={STATUS[c.status].tone}>{STATUS[c.status].label}</Chip>
+
+        <div>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <p className="text-[15px] font-bold">{allDone ? `All ${n} rounds cleared` : `Round ${c.round + 1} of ${n}: ${c.roundName}`}</p>
+            <p className="num text-[13px] text-sub">{cleared} cleared · {toGo} to go</p>
+          </div>
+          <div className="mt-2 grid gap-1" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }} aria-hidden="true">
+            {c.rounds.map((name, i) => <span key={name} className={`h-2 rounded-full ${SEGMENT[stateOf(i)]}`} />)}
+          </div>
+          <ol className="mt-3 flex flex-wrap gap-2" aria-label="Interview rounds">
+            {c.rounds.map((name, i) => {
+              const s = stateOf(i);
+              return (
+                <li key={name} aria-current={s === 'current' ? 'step' : undefined}
+                  className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] ${PILL[s]}`}>
+                  {s === 'done' ? <Icon name="check" size={12} strokeWidth={3} /> : s === 'stopped' ? <Icon name="pause" size={12} /> : <span className="num">{i + 1}</span>}
+                  {name}
+                  {s === 'current' && <span className="font-normal">· you are here</span>}
+                </li>
+              );
+            })}
+          </ol>
+        </div>
       </div>
-      <dl className="card-panel kv grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
-        <div><dt>Current round</dt><dd>{c.roundName}</dd></div>
-        <div><dt>Progress</dt><dd className="num">Round {c.round + 1} of {c.rounds.length}</dd></div>
+
+      <dl className="card-panel kv grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
         <div>
           <dt>Next update</dt>
-          <dd className="num">{nu ? (nu.slipped ? `${fmt(nu.from)} – ${fmt(nu.to)}` : fmtDay(nu.from)) : '—'}</dd>
+          <dd className="num">{nu ? (nu.slipped ? `${fmt(nu.from)} – ${fmt(nu.to)}` : fmtDay(nu.from)) : 'No more updates due'}</dd>
           {nu && nu.slipped && <p className="mt-0.5 text-xs text-bad">Was {fmt(nu.original)}. Moves forward until you hear from us.</p>}
         </div>
+        <div><dt>Last update</dt><dd className="num">{fmt(c.lastUpdateAt)} <span className="font-normal text-sub">· {ago(c.daysWaiting)}</span></dd></div>
         <div><dt>Recruiter</dt><dd>Priya Raman</dd></div>
       </dl>
     </section>
@@ -472,41 +494,18 @@ function OutcomeCard({ c }) {
   );
 }
 
-function RoundTracker({ c }) {
-  const n = c.rounds.length;
-  const allDone = ['offer', 'accepted', 'joined'].includes(c.status);
-  const stopped = ['rejected', 'paused'].includes(c.status);
-  return (
-    <section className="card card-top md:!p-6">
-      <SectionHead title="Interview rounds" note={allDone ? `All ${n} rounds cleared` : `${plural(c.round, 'round')} cleared · ${n - c.round - (stopped ? 0 : 1)} to go`} />
-      <ol className="track mt-6">
-        {c.rounds.map((name, i) => {
-          const state = allDone || i < c.round ? 'done' : i === c.round ? (stopped ? 'stopped' : 'current') : 'upcoming';
-          const status = { done: 'Cleared', current: 'You are here', upcoming: 'Coming up', stopped: c.status === 'paused' ? 'Paused here' : 'Ended here' }[state];
-          return (
-            <li key={name} className={state} aria-current={state === 'current' ? 'step' : undefined}>
-              <span className="dot">{state === 'done' ? <Icon name="check" size={14} strokeWidth={3} /> : i + 1}</span>
-              <span className="min-w-0 md:mt-3">
-                <span className="name block text-[15px] leading-snug">{name}</span>
-                <span className={`block text-xs ${state === 'current' ? 'font-bold text-accent' : state === 'stopped' ? 'font-bold text-bad' : 'text-sub'}`}>{status}</span>
-              </span>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
-  );
-}
-
 function MessageHistory({ messages }) {
+  const [all, setAll] = useState(false);
+  const shown = all ? messages : messages.slice(0, 3);
   return (
-    <section className="card card-top md:!p-6">
+    <section className="card card-top">
       <SectionHead title="Updates from Flexiple" count={messages.length} />
       {messages.length === 0 ? (
-        <p className="mt-4 text-[13px] text-sub">No updates yet. Your first one arrives after your profile review.</p>
+        <p className="mt-3 text-[13px] text-sub">No updates yet. Your first one arrives after your profile review.</p>
       ) : (
-        <ol className="timeline mt-6">
-          {messages.map((m, i) => (
+        <>
+        <ol className="timeline mt-4">
+          {shown.map((m, i) => (
             <li key={m.id}>
               <span className={`tdot ${i === 0 ? '!bg-accent !text-white' : ''}`}><Icon name={i === 0 ? 'sparkles' : 'check'} size={12} strokeWidth={2.5} /></span>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -519,6 +518,13 @@ function MessageHistory({ messages }) {
             </li>
           ))}
         </ol>
+        {messages.length > 3 && (
+          <button type="button" onClick={() => setAll(!all)} aria-expanded={all}
+            className="mt-3 inline-flex items-center gap-1 text-[13px] font-bold text-accent underline-offset-4 hover:underline">
+            {all ? 'Show fewer' : `Show all ${messages.length} updates`}<Icon name={all ? 'chevronUp' : 'chevronDown'} size={14} />
+          </button>
+        )}
+        </>
       )}
     </section>
   );
@@ -526,23 +532,20 @@ function MessageHistory({ messages }) {
 
 function SavedTests({ tests }) {
   return (
-    <section className="card card-top md:!p-6">
+    <section className="card card-top">
       <SectionHead title="Saved test results" note="Valid for 2 weeks. A new role only tests the skills it adds." />
       {tests.length === 0 ? (
-        <p className="mt-4 text-[13px] text-sub">No saved tests right now. Tests you pass appear here for 2 weeks.</p>
+        <p className="mt-3 text-[13px] text-sub">No saved tests right now. Tests you pass appear here for 2 weeks.</p>
       ) : (
-        <ul className="mt-4 grid gap-3">
+        <ul className="mt-3 grid gap-2">
           {tests.map(t => (
-            <li key={t.name} className="overflow-hidden rounded-[10px] border border-line">
-              <div className="flex items-center gap-3 p-4">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-tint text-accent"><Icon name="award" size={18} /></span>
-                <p className="min-w-0 flex-1 font-bold">{t.name}</p>
-                <p className="num font-bold">{t.score}</p>
+            <li key={t.name} className="flex items-center gap-3 rounded-[10px] border border-line px-3 py-2.5">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-tint text-accent"><Icon name="award" size={16} /></span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[15px] font-bold">{t.name}</p>
+                <p className="num text-[13px] text-sub">Passed {fmt(t.passedAt)} · valid until <b className="text-accent">{fmt(t.validUntil)}</b></p>
               </div>
-              <dl className="kv grid grid-cols-2 gap-4 bg-panel px-4 py-3">
-                <div><dt>Passed</dt><dd className="num !text-[13px]">{fmtLong(t.passedAt)}</dd></div>
-                <div><dt>Valid until</dt><dd className="num !text-[13px] !text-accent">{fmtLong(t.validUntil)}</dd></div>
-              </dl>
+              <p className="num shrink-0 font-bold">{t.score}</p>
             </li>
           ))}
         </ul>
@@ -555,15 +558,10 @@ function CandidateView({ version, cid }) {
   const { data: c, loading } = useApi(() => api.getCandidate(cid), [cid, version]);
   if (!c) return <Skeleton lines={3} height={140} />;
   return (
-    <div className={`fade grid gap-6 ${loading ? 'is-loading' : ''}`}>
-      <PageHead title="Your application" stats={<>
-        <DotStat tone={STATUS[c.status].tone}>{STATUS[c.status].label}</DotStat>
-        <DotStat tone="accent">{plural(c.messages.length, 'update')} received</DotStat>
-      </>} />
+    <div className={`fade grid gap-5 ${loading ? 'is-loading' : ''}`}>
       {c.status !== 'active' && <OutcomeCard c={c} />}
-      <StatusCard c={c} />
-      <RoundTracker c={c} />
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <ApplicationCard c={c} />
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <MessageHistory messages={c.messages} />
         <SavedTests tests={c.tests} />
       </div>
@@ -660,7 +658,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
     <article className="card">
       <div className="card-top">
         <div className="flex items-start gap-3">
-          <Avatar name={d.candidateName} size={48} status={d.guard.blocked ? 'bad' : 'good'} />
+          <Avatar name={d.candidateName} size={40} status={d.guard.blocked ? 'bad' : 'good'} />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
               <h3 className="text-[17px] font-bold">{d.candidateName}</h3>
@@ -669,7 +667,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
             <p className="truncate text-[13px] text-sub">{d.roleTitle} · {d.companyName}</p>
           </div>
         </div>
-        <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-sub"><Icon name="sparkles" size={12} />AI draft from pipeline facts · {hoursAgo(d.createdAt)}</p>
+        <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-sub"><Icon name="sparkles" size={12} />AI draft from pipeline facts · {hoursAgo(d.createdAt)}</p>
         {editing ? (
           <textarea
             id={`draft-text-${d.id}`}
@@ -686,7 +684,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
         {editing && !text.trim() && <p className="mt-1 text-xs font-bold text-bad">The message can't be empty.</p>}
       </div>
 
-      <div className="card-panel grid gap-4">
+      <div className="card-panel grid gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="mr-1 text-[13px] text-sub">Send by</span>
           {CHANNELS.map(ch => {
@@ -851,7 +849,7 @@ function RecruiterView({ version, bump, notify }) {
   const [busy, run] = useRunner(bump, notify);
   const m = useApi(() => api.getMetrics(), [version]);
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-6">
       <PageHead title="Recruiter overview" stats={m.data && <>
         <DotStat tone="good">In process {m.data.openCount}</DotStat>
         <DotStat tone="bad">Waiting 8+ days {m.data.noUpdate8}</DotStat>
@@ -859,7 +857,7 @@ function RecruiterView({ version, bump, notify }) {
         <Btn kind="soft" icon="inbox" onClick={() => document.getElementById('drafts')?.scrollIntoView({ behavior: 'smooth' })}>Go to drafts</Btn>
       </PageHead>
       <MetricsStrip version={version} />
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <Alerts version={version} busy={busy} run={run} />
         <Drafts version={version} bump={bump} notify={notify} />
       </div>
@@ -873,7 +871,7 @@ function RecruiterView({ version, bump, notify }) {
 function StageBars({ r }) {
   const max = Math.max(1, ...r.stageCounts);
   return (
-    <ol className="grid gap-2.5">
+    <ol className="grid gap-1.5">
       {r.rounds.map((name, i) => {
         const count = r.stageCounts[i];
         const wait = r.stageLongestWait[i];
@@ -912,22 +910,15 @@ function HiringBoard({ companyId, version, busy, run }) {
             return (
               <article key={r.id} className="card flex flex-col">
                 <div className="card-top flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-tint text-accent"><Icon name="briefcase" size={20} /></span>
-                    <div className="min-w-0">
-                      <h3 className="text-[17px] font-bold leading-snug">{r.title}</h3>
-                      <p className="text-[13px] text-sub">{plural(r.rounds.length, 'round')}</p>
-                    </div>
+                  <div className="min-w-0">
+                    <h3 className="text-[17px] font-bold leading-snug">{r.title}</h3>
+                    <p className="num text-[13px] text-sub"><b className="text-ink">{r.activeCount}</b> in process · moved {r.daysSinceMove === null ? 'never' : ago(r.daysSinceMove)} · {plural(r.rounds.length, 'round')}</p>
                   </div>
                   {r.status === 'paused' ? <Chip tone="warn" icon="pause">Paused</Chip> : <Chip tone="good">Open</Chip>}
                 </div>
-                <div className="card-panel flex flex-1 flex-col gap-4">
-                  <dl className="kv grid grid-cols-2 gap-4">
-                    <div><dt>In process</dt><dd className="num">{r.activeCount}</dd></div>
-                    <div><dt>Last movement</dt><dd>{r.daysSinceMove === null ? 'Never' : ago(r.daysSinceMove)}</dd></div>
-                  </dl>
+                <div className="card-panel flex flex-1 flex-col gap-3">
                   <StageBars r={r} />
-                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-1">
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[#EADBCF] pt-3">
                     <p className={`text-[13px] ${longest >= 8 ? 'font-bold text-bad' : 'text-sub'}`}>
                       {r.activeCount ? `Longest wait: ${plural(longest, 'day')}` : r.offerCount ? plural(r.offerCount, 'offer') + ' out' : 'No one in process'}
                     </p>
@@ -1061,7 +1052,7 @@ function ClientView({ version, bump, notify, companyId, company }) {
   const [busy, run] = useRunner(bump, notify);
   const m = useApi(() => api.getMetrics(companyId), [companyId, version]);
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-6">
       <PageHead title={company ? company.name : 'Company'} stats={m.data && <>
         <DotStat tone="good">In process {m.data.openCount}</DotStat>
         <DotStat tone="bad">Offers at risk {m.data.atRisk}</DotStat>
