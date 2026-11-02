@@ -11,7 +11,7 @@
 
   const DAY = 24 * 60 * 60 * 1000;
   const WEEK = 7 * DAY;
-  const YEAR = 365 * DAY;
+  const TEST_VALIDITY = 14 * DAY; // passed tests can be reused for 2 weeks
   const CHANNELS = ['inapp', 'email', 'whatsapp'];
   const MAX_PER_WEEK = 2;
 
@@ -55,10 +55,10 @@
   }
 
   function validTests(c) {
-    const cutoff = Date.now() - YEAR;
+    const cutoff = Date.now() - TEST_VALIDITY;
     return c.tests
       .filter(t => t.passedAt > cutoff)
-      .map(t => ({ ...t, validUntil: t.passedAt + YEAR }))
+      .map(t => ({ ...t, validUntil: t.passedAt + TEST_VALIDITY }))
       .sort((a, b) => b.passedAt - a.passedAt);
   }
 
@@ -265,8 +265,8 @@
     });
 
     const k1 = candOf('k1');
-    k1.tests.push({ name: 'System design fundamentals', score: 'Pass', passedAt: at(-212) });
-    k1.tests.push({ name: 'JavaScript basics', score: '81/100', passedAt: at(-420) }); // older than 12 months: hidden
+    k1.tests.push({ name: 'System design fundamentals', score: 'Pass', passedAt: at(-9) });
+    k1.tests.push({ name: 'JavaScript basics', score: '81/100', passedAt: at(-40) }); // older than 2 weeks: hidden
 
     // Nikhil got a check-in 5 days ago, so a third message this week is blocked.
     const k8 = candOf('k8');
