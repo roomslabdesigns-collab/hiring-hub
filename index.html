@@ -8,100 +8,96 @@
 <title>Flexiple Hiring Hub</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-  /* Layout: sticky forest header with familiar tabs, a slim forest hero that holds the "viewing as" control,
-     then a white working area on a 4px spacing grid. Colours are the Flexiple palette only. */
+  /* Layout: white sidebar (logo, Main nav, info card) + top bar with name and avatar, then a light-grey
+     working area with white cards whose details sit in a grey bottom panel. Accent is Flexiple green. */
   :root {
-    --forest: #072C1B;
-    --forest-hover: #0E3D27;
-    --lime: #CFF07D;
-    --cream: #F9ECE3;
-    --rust: #A85A34;
+    --accent: #072C1B;
+    --accent-hover: #0E3D27;
+    --tint: #EDF3EE;
+    --ink: #141414;
+    --sub: #6B7280;
+    --line: #ECECEC;
+    --panel: #F7F7F7;
+    --page: #FAFAFA;
     --white: #FFFFFF;
-    --muted: #55665C;
-    --line: #E2E7E0;
-    --low-bg: #DCEFD8; --low-fg: #245C37;
-    --mid-bg: #FBEBC6; --mid-fg: #7A5300;
-    --high-bg: #F5D3C4; --high-fg: #8F3415;
-    --shadow-card: 0 1px 2px rgba(7, 44, 27, .04), 0 6px 20px rgba(7, 44, 27, .05);
-    --shadow-pop: 0 8px 32px rgba(7, 44, 27, .18);
-    --r-card: 14px;
-    --r-small: 10px;
+    --good: #16A34A; --good-tint: #E8F5EC;
+    --warn: #B45309; --warn-tint: #FEF3E2;
+    --bad: #DC2626;  --bad-tint: #FDECEC;
+    --r-card: 12px;
+    --r-btn: 8px;
+    --shadow: 0 1px 2px rgba(20, 20, 20, .04);
     --font: Arial, Helvetica, sans-serif;
     color-scheme: light;
   }
-  html, body { background: var(--white); color: var(--forest); font-family: var(--font); }
+  html, body { background: var(--page); color: var(--ink); font-family: var(--font); }
   body { font-size: 15px; line-height: 1.5; }
-  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--forest); }
-
-  /* Type scale: 24 / 18 / 15 / 13 / 12. Large text gets tighter tracking and line height. */
-  .t-title { font-size: 24px; line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; text-wrap: balance; }
-  .t-h { font-size: 18px; line-height: 1.25; letter-spacing: -0.01em; font-weight: 700; text-wrap: balance; }
-  .t-meta { font-size: 13px; line-height: 1.45; color: var(--muted); }
-  .label { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: var(--white); }
+  h1, h2, h3 { text-wrap: balance; }
   .num { font-variant-numeric: tabular-nums; }
-
+  .grid > * { min-width: 0; }
   .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   @media (min-width: 768px) {
-    .gutter { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); }
+    .gutter { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
   }
-  .site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
-  .grid > * { min-width: 0; }
+  .topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; }
+  .sidebar { position: sticky; top: env(safe-area-inset-top, 0px); height: calc(100vh - env(safe-area-inset-top, 0px)); }
 
-  /* One surface style for every card; cream only for wells inside cards. */
-  .card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow-card); padding: 20px; }
-  @media (min-width: 768px) { .card { padding: 24px; } }
-  .well { background: var(--cream); border-radius: var(--r-small); }
+  /* Card: white top, grey details panel underneath */
+  .card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .card-top { padding: 20px; }
+  .card-panel { background: var(--panel); padding: 20px; }
+  .kv dt { font-size: 13px; color: var(--sub); }
+  .kv dd { margin: 2px 0 0; font-size: 15px; font-weight: 700; color: var(--ink); }
 
   .fade { transition: opacity .2s; }
   .is-loading { opacity: .55; }
   .spinner { width: 14px; height: 14px; border-radius: 999px; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .skeleton { background: linear-gradient(90deg, var(--cream) 0%, #FCF5EF 50%, var(--cream) 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
+  .skeleton { background: linear-gradient(90deg, #F2F2F2 0%, #F9F9F9 50%, #F2F2F2 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
   @keyframes shimmer { to { background-position: -200% 0; } }
 
-  /* Round tracker: vertical timeline on phones, a connected row of steps on wide screens. */
+  /* Round tracker */
   .track { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
   .track li { position: relative; display: flex; gap: 12px; padding-bottom: 20px; min-width: 0; }
   .track li:last-child { padding-bottom: 0; }
   .track li:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: 32px; bottom: 4px; width: 2px; border-radius: 2px; background: var(--line); }
-  .track li.done:not(:last-child)::after { background: var(--forest); }
-  .track .dot { flex: none; width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--white); border: 2px solid var(--line); color: var(--muted); position: relative; z-index: 1; }
-  .track .done .dot { background: var(--forest); border-color: var(--forest); color: var(--lime); }
-  .track .current .dot { background: var(--lime); border-color: var(--forest); color: var(--forest); box-shadow: 0 0 0 5px rgba(207, 240, 125, .45); }
-  .track .stopped .dot { background: var(--rust); border-color: var(--rust); color: var(--white); }
-  .track .upcoming .name { color: var(--muted); font-weight: 400; }
-  .track .current .name { font-weight: 700; }
+  .track li.done:not(:last-child)::after { background: var(--accent); }
+  .track .dot { flex: none; width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--white); border: 2px solid var(--line); color: var(--sub); position: relative; z-index: 1; }
+  .track .done .dot { background: var(--accent); border-color: var(--accent); color: var(--white); }
+  .track .current .dot { background: var(--white); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 5px var(--tint); }
+  .track .stopped .dot { background: var(--bad); border-color: var(--bad); color: var(--white); }
+  .track .upcoming .name { color: var(--sub); }
+  .track .current .name, .track .done .name { font-weight: 700; }
   @media (min-width: 900px) {
     .track { flex-direction: row; }
     .track li { flex: 1 1 0; flex-direction: column; padding-bottom: 0; padding-right: 8px; }
     .track li:not(:last-child)::after { left: 36px; right: 4px; top: 13px; bottom: auto; width: auto; height: 2px; }
   }
 
-  /* Message history timeline */
   .timeline { list-style: none; margin: 0; padding: 0; }
   .timeline li { position: relative; padding-left: 36px; padding-bottom: 20px; }
   .timeline li:last-child { padding-bottom: 0; }
   .timeline li:not(:last-child)::before { content: ""; position: absolute; left: 11px; top: 28px; bottom: 4px; width: 2px; background: var(--line); border-radius: 2px; }
-  .timeline .tdot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: var(--cream); color: var(--forest); }
+  .timeline .tdot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: var(--panel); color: var(--sub); }
 
-  .table-wrap { position: relative; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--white); box-shadow: var(--shadow-card); }
+  .table-wrap { position: relative; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--white); box-shadow: var(--shadow); }
   .table-wrap table { width: 100%; border-collapse: collapse; min-width: 780px; font-size: 15px; }
-  .table-wrap th { background: var(--forest); color: var(--lime); text-align: left; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding: 12px 16px; font-weight: 700; white-space: nowrap; }
-  .table-wrap td { padding: 16px; border-top: 1px solid var(--line); vertical-align: top; }
+  .table-wrap th { background: var(--panel); color: var(--sub); text-align: left; font-size: 13px; font-weight: 400; padding: 12px 20px; white-space: nowrap; }
+  .table-wrap td { padding: 16px 20px; border-top: 1px solid var(--line); vertical-align: top; }
   .table-wrap tbody tr { transition: background-color .15s; }
-  .table-wrap tbody tr:hover { background: #FCF7F3; }
+  .table-wrap tbody tr:hover { background: #FCFCFC; }
 
-  .bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
-  .bar > span { display: block; height: 100%; border-radius: 999px; background: var(--forest); transition: width .4s ease; }
+  .bar { height: 6px; border-radius: 999px; background: #E9E9E9; overflow: hidden; }
+  .bar > span { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .4s ease; }
 
-  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 30; max-width: calc(100% - 32px); width: max-content; transform: translateX(-50%); animation: toast-in .28s cubic-bezier(.2, .8, .2, 1); box-shadow: var(--shadow-pop); }
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 50; max-width: calc(100% - 32px); width: max-content; transform: translateX(-50%); animation: toast-in .28s cubic-bezier(.2, .8, .2, 1); box-shadow: 0 8px 32px rgba(20, 20, 20, .18); }
   @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
   .sent-flash { animation: sent-in .3s cubic-bezier(.2, .8, .2, 1); }
-  @keyframes sent-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+  @keyframes sent-in { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
   .pop { animation: pop .35s cubic-bezier(.2, .8, .2, 1); }
   @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
 
-  button:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--rust); outline-offset: 2px; }
+  button:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 
@@ -112,7 +108,10 @@
   tailwind.config = {
     theme: {
       extend: {
-        colors: { forest: '#072C1B', lime: '#CFF07D', cream: '#F9ECE3', rust: '#A85A34', muted: '#55665C', line: '#E2E7E0' },
+        colors: {
+          accent: '#072C1B', tint: '#EDF3EE', ink: '#141414', sub: '#6B7280', line: '#ECECEC', panel: '#F7F7F7', page: '#FAFAFA',
+          good: '#16A34A', bad: '#DC2626', warn: '#B45309',
+        },
         fontFamily: { sans: ['Arial', 'Helvetica', 'sans-serif'] },
       },
     },
@@ -124,7 +123,7 @@
 <script src="api.js"></script>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useCallback, useRef } = React;
+const { useState, useEffect, useCallback } = React;
 const api = window.HubAPI;
 
 /* ---------- helpers ---------- */
@@ -143,12 +142,12 @@ const hoursAgo = t => {
 const CHANNELS = ['inapp', 'email', 'whatsapp'];
 const CHANNEL = { inapp: { label: 'In-app', icon: 'phone' }, email: { label: 'Email', icon: 'mail' }, whatsapp: { label: 'WhatsApp', icon: 'chat' } };
 const STATUS = {
-  active: { label: 'In process', tone: 'neutral' },
-  offer: { label: 'Offer made', tone: 'low' },
-  accepted: { label: 'Offer accepted', tone: 'low' },
-  rejected: { label: 'Not selected', tone: 'medium' },
-  paused: { label: 'On hold', tone: 'medium' },
-  joined: { label: 'Joined', tone: 'low' },
+  active: { label: 'In process', tone: 'good' },
+  offer: { label: 'Offer made', tone: 'good' },
+  accepted: { label: 'Offer accepted', tone: 'good' },
+  rejected: { label: 'Not selected', tone: 'bad' },
+  paused: { label: 'On hold', tone: 'warn' },
+  joined: { label: 'Joined', tone: 'good' },
 };
 const store = {
   get: (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } },
@@ -185,7 +184,7 @@ function useRunner(bump, notify) {
   return [busy, run];
 }
 
-/* ---------- icons: one stroke set, sized to the text line ---------- */
+/* ---------- icons ---------- */
 
 const ICONS = {
   check: ['M20 6 9 17l-5-5'],
@@ -217,7 +216,8 @@ const ICONS = {
   flag: ['M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z', 'M4 22v-7'],
   shield: ['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'],
   userCheck: ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'c:9,7,4', 'm16 11 2 2 4-4'],
-  target: ['c:12,12,10', 'c:12,12,6', 'c:12,12,2'],
+  bell: ['M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9', 'M10.3 21a1.94 1.94 0 0 0 3.4 0'],
+  info: ['c:12,12,10', 'M12 16v-4', 'M12 8h.01'],
 };
 
 function Icon({ name, size = 16, className = '', strokeWidth = 2 }) {
@@ -236,17 +236,18 @@ function Icon({ name, size = 16, className = '', strokeWidth = 2 }) {
 /* ---------- building blocks ---------- */
 
 function Btn({ kind = 'primary', small, icon, loading, className = '', children, ...props }) {
-  const size = small ? 'h-8 px-4 text-[13px] gap-1.5' : 'h-10 px-5 text-sm gap-2';
+  const size = small ? 'h-8 px-3 text-[13px] gap-1.5' : 'h-10 px-4 text-sm gap-2';
   const look = {
-    primary: 'bg-forest text-lime hover:bg-[#0E3D27] shadow-[0_1px_2px_rgba(7,44,27,.2)]',
-    secondary: 'bg-white text-forest border border-forest hover:bg-cream',
-    quiet: 'text-muted hover:text-forest hover:bg-cream',
+    primary: 'bg-accent text-white hover:bg-[#0E3D27]',
+    secondary: 'bg-white text-ink border border-line hover:border-[#D4D4D4] hover:bg-panel',
+    soft: 'bg-tint text-accent border border-accent/30 hover:border-accent',
+    quiet: 'text-sub hover:text-ink hover:bg-panel',
   }[kind];
   return (
     <button
       type="button"
       aria-busy={loading || undefined}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-full font-bold transition duration-150 active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${size} ${look} ${className}`}
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-[8px] font-bold transition duration-150 active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${size} ${look} ${className}`}
       {...props}
     >
       {loading ? <span className="spinner" /> : icon && <Icon name={icon} size={small ? 14 : 16} />}
@@ -257,14 +258,12 @@ function Btn({ kind = 'primary', small, icon, loading, className = '', children,
 
 function Chip({ tone = 'neutral', icon, children, className = '', title }) {
   const look = {
-    neutral: 'bg-white text-muted border border-line',
-    lime: 'bg-lime text-forest',
-    forest: 'bg-forest text-lime',
-    rust: 'bg-rust text-white',
-    cream: 'bg-cream text-forest',
-    low: 'bg-[var(--low-bg)] text-[var(--low-fg)]',
-    medium: 'bg-[var(--mid-bg)] text-[var(--mid-fg)]',
-    high: 'bg-[var(--high-bg)] text-[var(--high-fg)]',
+    neutral: 'bg-white text-sub border border-line',
+    accent: 'bg-tint text-accent',
+    solid: 'bg-accent text-white',
+    good: 'bg-[var(--good-tint)] text-[#15803D]',
+    warn: 'bg-[var(--warn-tint)] text-[var(--warn)]',
+    bad: 'bg-[var(--bad-tint)] text-[#B91C1C]',
   }[tone];
   return (
     <span title={title} className={`inline-flex h-6 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-xs font-bold ${look} ${className}`}>
@@ -274,28 +273,41 @@ function Chip({ tone = 'neutral', icon, children, className = '', title }) {
   );
 }
 
-const RISK_TONE = { Low: 'low', Medium: 'medium', High: 'high' };
-function RiskChip({ level }) {
+// Coloured dot + label, as in "● Active 850"
+function DotStat({ tone = 'good', children }) {
+  const c = { good: 'bg-good', bad: 'bg-bad', warn: 'bg-[#F59E0B]', accent: 'bg-accent' }[tone];
+  return <span className="inline-flex items-center gap-1.5 text-[13px] text-ink"><span className={`h-2 w-2 rounded-full ${c}`} aria-hidden="true" />{children}</span>;
+}
+
+const RISK_TONE = { Low: 'good', Medium: 'warn', High: 'bad' };
+const RiskChip = ({ level }) => (
+  <Chip tone={RISK_TONE[level]}><span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />{level} risk</Chip>
+);
+
+function WaitChip({ days }) {
+  return <Chip tone={days >= 8 ? 'bad' : 'neutral'} icon="clock" className="num" title={`${plural(days, 'day')} since the last update`}>{plural(days, 'day')}</Chip>;
+}
+
+function Avatar({ name, size = 40, status }) {
+  const initials = name.split(' ').map(p => p[0]).slice(0, 2).join('');
+  const dot = status && { good: 'bg-good', bad: 'bg-bad', warn: 'bg-[#F59E0B]' }[status];
   return (
-    <Chip tone={RISK_TONE[level]}>
-      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
-      {level} risk
-    </Chip>
+    <span className="relative inline-grid shrink-0" style={{ width: size, height: size }} aria-hidden="true">
+      <span className="grid h-full w-full place-items-center rounded-full bg-tint font-bold text-accent" style={{ fontSize: size * 0.36 }}>{initials}</span>
+      {dot && <span className={`absolute bottom-0 right-0 rounded-full border-2 border-white ${dot}`} style={{ width: size * 0.3, height: size * 0.3 }} />}
+    </span>
   );
 }
 
-function WaitChip({ days }) {
-  return <Chip tone={days >= 8 ? 'rust' : 'neutral'} icon="clock" className="num" title={`${plural(days, 'day')} since the last update`}>{plural(days, 'day')}</Chip>;
-}
-
-const AVATAR_TONES = ['bg-cream text-forest', 'bg-lime text-forest', 'bg-forest text-lime'];
-function Avatar({ name, size = 36 }) {
-  const initials = name.split(' ').map(p => p[0]).slice(0, 2).join('');
-  const tone = AVATAR_TONES[[...name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % AVATAR_TONES.length];
+function PageHead({ title, stats, children }) {
   return (
-    <span className={`grid shrink-0 place-items-center rounded-full font-bold ${tone}`} style={{ width: size, height: size, fontSize: size * 0.38 }} aria-hidden="true">
-      {initials}
-    </span>
+    <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="min-w-0">
+        <h2 className="text-xl font-bold leading-tight">{title}</h2>
+        {stats && <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">{stats}</div>}
+      </div>
+      {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
+    </div>
   );
 }
 
@@ -303,11 +315,11 @@ function SectionHead({ title, note, count, children }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
-        <h2 className="t-h flex items-center gap-2">
+        <h2 className="flex items-center gap-2 text-[17px] font-bold">
           {title}
-          {count !== undefined && <span className="num rounded-full bg-cream px-2 text-[13px] font-bold leading-6">{count}</span>}
+          {count !== undefined && <span className="num rounded-full bg-panel px-2 text-[13px] leading-6 text-sub">{count}</span>}
         </h2>
-        {note && <p className="t-meta mt-1">{note}</p>}
+        {note && <p className="mt-0.5 text-[13px] text-sub">{note}</p>}
       </div>
       {children}
     </div>
@@ -328,32 +340,13 @@ function FilterChips({ value, onChange, options, label }) {
             disabled={!on && o.count === 0}
             title={!on && o.count === 0 ? 'Nothing to show' : undefined}
             onClick={() => onChange(o.value)}
-            className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-bold transition active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'border-forest bg-forest text-lime' : 'border-line bg-white text-forest hover:border-forest'}`}
+            className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[13px] font-bold transition active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'border-accent bg-tint text-accent' : 'border-line bg-white text-ink hover:border-[#D4D4D4]'}`}
           >
             {o.label}
-            <span className={`num rounded-full px-1.5 text-xs leading-5 ${on ? 'bg-lime text-forest' : 'bg-cream text-forest'}`}>{o.count}</span>
+            <span className={`num rounded-full px-1.5 text-xs leading-5 ${on ? 'bg-accent text-white' : 'bg-panel text-sub'}`}>{o.count}</span>
           </button>
         );
       })}
-    </div>
-  );
-}
-
-function HeroPicker({ id, label, value, onChange, options }) {
-  return (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <label htmlFor={id} className="text-xs font-bold uppercase tracking-[0.1em] text-lime">{label}</label>
-      <div className="relative">
-        <select
-          id={id}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          className="h-11 w-full max-w-full cursor-pointer appearance-none rounded-full border border-white/20 bg-white pl-4 pr-10 text-sm font-bold text-forest transition hover:border-lime sm:w-auto sm:min-w-[300px]"
-        >
-          {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-        <Icon name="chevronDown" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-forest" />
-      </div>
     </div>
   );
 }
@@ -368,53 +361,51 @@ function Skeleton({ lines = 3, height = 72 }) {
 
 function Empty({ icon, title, body }) {
   return (
-    <div className="card flex flex-col items-center gap-2 py-10 text-center">
-      <span className="grid h-10 w-10 place-items-center rounded-full bg-cream"><Icon name={icon} size={20} /></span>
+    <div className="card flex flex-col items-center gap-2 px-6 py-10 text-center">
+      <span className="grid h-10 w-10 place-items-center rounded-full bg-tint text-accent"><Icon name={icon} size={20} /></span>
       <p className="font-bold">{title}</p>
-      {body && <p className="t-meta max-w-xs">{body}</p>}
+      {body && <p className="max-w-xs text-[13px] text-sub">{body}</p>}
     </div>
   );
 }
 
-/* ---------- metrics: four chunks, number first ---------- */
+/* ---------- metrics ---------- */
 
 function MetricsStrip({ companyId, version }) {
   const { data: m, loading } = useApi(() => api.getMetrics(companyId), [companyId, version]);
-  if (!m) return <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[0, 1, 2, 3].map(i => <div key={i} className="skeleton h-[112px]" />)}</div>;
+  if (!m) return <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[0, 1, 2, 3].map(i => <div key={i} className="skeleton h-[118px]" />)}</div>;
   const tiles = [
     { icon: 'clock', label: 'No update for 8+ days', value: m.noUpdate8, note: `of ${plural(m.openCount, 'open application')}`, warn: m.noUpdate8 > 0 },
-    { icon: 'flag', label: 'Closed with a clear outcome', value: `${m.clearPct}%`, note: `${m.clear} of ${m.closed} closed`, bar: m.clearPct },
+    { icon: 'flag', label: 'Closed with clear outcome', value: `${m.clearPct}%`, note: `${m.clear} of ${m.closed} closed`, bar: m.clearPct },
     { icon: 'shield', label: 'Accepted offers at risk', value: m.atRisk, note: `${m.high} high · ${m.offers} accepted`, warn: m.high > 0 },
     { icon: 'send', label: 'Sent this week', value: m.sent, note: `of ${plural(m.drafted, 'draft')}` },
   ];
   return (
     <section aria-label="Key numbers" className={`fade grid grid-cols-2 gap-4 lg:grid-cols-4 ${loading ? 'is-loading' : ''}`}>
       {tiles.map(t => (
-        <div key={t.label} className="card !p-4 md:!p-5">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-[13px] font-bold leading-tight text-muted">{t.label}</p>
-            <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${t.warn ? 'bg-[var(--high-bg)] text-rust' : 'bg-cream text-forest'}`}><Icon name={t.icon} size={16} /></span>
+        <div key={t.label} className="card p-4 md:p-5">
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-[13px] leading-tight text-sub">{t.label}</p>
+            <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${t.warn ? 'bg-[var(--bad-tint)] text-bad' : 'bg-tint text-accent'}`}><Icon name={t.icon} size={16} /></span>
           </div>
-          <p className={`num mt-2 text-2xl font-bold leading-none ${t.warn ? 'text-rust' : 'text-forest'}`}>{t.value}</p>
+          <p className={`num mt-2 text-2xl font-bold leading-none ${t.warn ? 'text-bad' : 'text-ink'}`}>{t.value}</p>
           {t.bar !== undefined
-            ? <div className="mt-3 flex items-center gap-2"><div className="bar flex-1"><span style={{ width: `${t.bar}%` }} /></div><span className="t-meta whitespace-nowrap">{t.note}</span></div>
-            : <p className="t-meta mt-2">{t.note}</p>}
+            ? <div className="mt-3 flex items-center gap-2"><div className="bar flex-1"><span style={{ width: `${t.bar}%` }} /></div><span className="whitespace-nowrap text-[13px] text-sub">{t.note}</span></div>
+            : <p className="mt-2 text-[13px] text-sub">{t.note}</p>}
         </div>
       ))}
     </section>
   );
 }
 
-/* ---------- pause a role: state the effect before the action ---------- */
+/* ---------- pause a role ---------- */
 
-function PauseControl({ role, busy, run, compact }) {
+function PauseControl({ role, busy, run }) {
   const [confirming, setConfirming] = useState(false);
-  if (role.status === 'paused') return <Chip tone="rust" icon="pause">Paused {role.pausedAt ? fmt(role.pausedAt) : ''}</Chip>;
-  if (!confirming) {
-    return <Btn small kind="secondary" icon="pause" disabled={!!busy} onClick={() => setConfirming(true)}>Pause role</Btn>;
-  }
+  if (role.status === 'paused') return <Chip tone="warn" icon="pause">Paused {role.pausedAt ? fmt(role.pausedAt) : ''}</Chip>;
+  if (!confirming) return <Btn small kind="secondary" icon="pause" disabled={!!busy} onClick={() => setConfirming(true)}>Pause role</Btn>;
   return (
-    <div className={`sent-flash flex flex-wrap items-center gap-2 rounded-[var(--r-small)] border border-rust bg-white p-2 ${compact ? '' : 'pl-3'}`}>
+    <div className="sent-flash flex flex-wrap items-center gap-2 rounded-[8px] border border-line bg-white p-1.5 pl-3">
       <span className="text-[13px]">{role.activeCount ? `${plural(role.activeCount, 'candidate')} will get an outcome draft.` : 'No one is in process.'}</span>
       <Btn small icon="pause" loading={busy === 'pause-' + role.id} onClick={() => {
         setConfirming(false);
@@ -430,28 +421,27 @@ function PauseControl({ role, busy, run, compact }) {
 function StatusCard({ c }) {
   const nu = c.nextUpdate;
   return (
-    <section className="card grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <Chip tone={STATUS[c.status].tone}>{STATUS[c.status].label}</Chip>
-          {c.status === 'active' && <span className="t-meta num">Round {c.round + 1} of {c.rounds.length}</span>}
-        </div>
-        <h2 className="t-title mt-3">{c.roleTitle}</h2>
-        <p className="t-meta mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span className="inline-flex items-center gap-1.5"><Icon name="building" size={14} />{c.companyName}</span>
-          <span className="inline-flex items-center gap-1.5"><Icon name="user" size={14} />Recruiter: Priya Raman</span>
-        </p>
-      </div>
-      {nu && (
-        <div className="well flex items-center gap-3 p-4 md:min-w-[260px]">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-forest text-lime"><Icon name="calendar" size={18} /></span>
+    <section className="card">
+      <div className="card-top flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-4">
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-tint text-accent"><Icon name="briefcase" size={24} /></span>
           <div className="min-w-0">
-            <p className="text-[13px] font-bold text-muted">Next update</p>
-            <p className="t-h num">{nu.slipped ? `${fmt(nu.from)} – ${fmt(nu.to)}` : fmtDay(nu.from)}</p>
-            {nu.slipped && <p className="mt-0.5 text-xs font-bold text-rust">Was {fmt(nu.original)}. Moves forward until you hear from us.</p>}
+            <h3 className="text-lg font-bold leading-snug">{c.roleTitle}</h3>
+            <p className="text-[13px] text-sub">{c.companyName}</p>
           </div>
         </div>
-      )}
+        <Chip tone={STATUS[c.status].tone}>{STATUS[c.status].label}</Chip>
+      </div>
+      <dl className="card-panel kv grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+        <div><dt>Current round</dt><dd>{c.roundName}</dd></div>
+        <div><dt>Progress</dt><dd className="num">Round {c.round + 1} of {c.rounds.length}</dd></div>
+        <div>
+          <dt>Next update</dt>
+          <dd className="num">{nu ? (nu.slipped ? `${fmt(nu.from)} – ${fmt(nu.to)}` : fmtDay(nu.from)) : '—'}</dd>
+          {nu && nu.slipped && <p className="mt-0.5 text-xs text-bad">Was {fmt(nu.original)}. Moves forward until you hear from us.</p>}
+        </div>
+        <div><dt>Recruiter</dt><dd>Priya Raman</dd></div>
+      </dl>
     </section>
   );
 }
@@ -459,20 +449,20 @@ function StatusCard({ c }) {
 function OutcomeCard({ c }) {
   const n = c.rounds.length;
   const content = {
-    paused: { icon: 'pause', chip: 'Role paused', title: 'This role is on hold', body: `${c.companyName} paused hiring for this role, so your application is closed for now. You reached ${c.roundName}, round ${c.round + 1} of ${n}.` },
-    rejected: { icon: 'flag', chip: 'Not selected', title: 'Not selected for this role', body: `${c.companyName} decided not to move forward after ${c.roundName}. Your saved test results still count for other Flexiple roles.` },
-    offer: { icon: 'award', chip: 'Offer', title: `${c.companyName} has made you an offer`, body: `You cleared all ${n} rounds. Your recruiter will go through the offer with you.` },
-    accepted: c.offer && { icon: 'calendar', chip: 'Offer accepted', title: `You join ${c.companyName} on ${fmtLong(c.offer.joiningDate)}`, body: `${plural(c.offer.daysLeft, 'day')} to go. Your recruiter stays in touch until Day 1.` },
-    joined: { icon: 'userCheck', chip: 'Joined', title: `You joined ${c.companyName}`, body: 'Your hiring process is complete.' },
+    paused: { icon: 'pause', tone: 'warn', chip: 'Role paused', title: 'This role is on hold', body: `${c.companyName} paused hiring for this role, so your application is closed for now. You reached ${c.roundName}, round ${c.round + 1} of ${n}.` },
+    rejected: { icon: 'flag', tone: 'bad', chip: 'Not selected', title: 'Not selected for this role', body: `${c.companyName} decided not to move forward after ${c.roundName}. Your saved test results still count for other Flexiple roles.` },
+    offer: { icon: 'award', tone: 'good', chip: 'Offer', title: `${c.companyName} has made you an offer`, body: `You cleared all ${n} rounds. Your recruiter will go through the offer with you.` },
+    accepted: c.offer && { icon: 'calendar', tone: 'good', chip: 'Offer accepted', title: `You join ${c.companyName} on ${fmtLong(c.offer.joiningDate)}`, body: `${plural(c.offer.daysLeft, 'day')} to go. Your recruiter stays in touch until Day 1.` },
+    joined: { icon: 'userCheck', tone: 'good', chip: 'Joined', title: `You joined ${c.companyName}`, body: 'Your hiring process is complete.' },
   }[c.status];
   if (!content) return null;
   return (
-    <section className="sent-flash flex gap-4 rounded-[var(--r-card)] bg-forest p-5 text-cream md:p-6" aria-label="Application outcome">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-lime text-forest"><Icon name={content.icon} size={18} /></span>
+    <section className="sent-flash card flex gap-4 border-accent/20 bg-tint p-5" aria-label="Application outcome">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-white"><Icon name={content.icon} size={18} /></span>
       <div className="min-w-0">
-        <p className="text-xs font-bold uppercase tracking-[0.1em] text-lime">{content.chip}</p>
-        <h3 className="t-h mt-1 text-white">{content.title}</h3>
-        <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-cream">{content.body}</p>
+        <Chip tone={content.tone}>{content.chip}</Chip>
+        <h3 className="mt-2 text-lg font-bold text-accent">{content.title}</h3>
+        <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-ink">{content.body}</p>
       </div>
     </section>
   );
@@ -483,8 +473,8 @@ function RoundTracker({ c }) {
   const allDone = ['offer', 'accepted', 'joined'].includes(c.status);
   const stopped = ['rejected', 'paused'].includes(c.status);
   return (
-    <section className="card">
-      <SectionHead title="Your interview rounds" note={allDone ? `All ${n} rounds cleared` : `${plural(c.round, 'round')} cleared · ${n - c.round - (stopped ? 0 : 1)} to go`} />
+    <section className="card card-top md:!p-6">
+      <SectionHead title="Interview rounds" note={allDone ? `All ${n} rounds cleared` : `${plural(c.round, 'round')} cleared · ${n - c.round - (stopped ? 0 : 1)} to go`} />
       <ol className="track mt-6">
         {c.rounds.map((name, i) => {
           const state = allDone || i < c.round ? 'done' : i === c.round ? (stopped ? 'stopped' : 'current') : 'upcoming';
@@ -494,7 +484,7 @@ function RoundTracker({ c }) {
               <span className="dot">{state === 'done' ? <Icon name="check" size={14} strokeWidth={3} /> : i + 1}</span>
               <span className="min-w-0 md:mt-3">
                 <span className="name block text-[15px] leading-snug">{name}</span>
-                <span className={`block text-xs ${state === 'current' ? 'font-bold text-forest' : state === 'stopped' ? 'font-bold text-rust' : 'text-muted'}`}>{status}</span>
+                <span className={`block text-xs ${state === 'current' ? 'font-bold text-accent' : state === 'stopped' ? 'font-bold text-bad' : 'text-sub'}`}>{status}</span>
               </span>
             </li>
           );
@@ -506,22 +496,22 @@ function RoundTracker({ c }) {
 
 function MessageHistory({ messages }) {
   return (
-    <section className="card">
+    <section className="card card-top md:!p-6">
       <SectionHead title="Updates from Flexiple" count={messages.length} />
       {messages.length === 0 ? (
-        <p className="t-meta mt-4">No updates yet. Your first one arrives after your profile review.</p>
+        <p className="mt-4 text-[13px] text-sub">No updates yet. Your first one arrives after your profile review.</p>
       ) : (
         <ol className="timeline mt-6">
           {messages.map((m, i) => (
             <li key={m.id}>
-              <span className={`tdot ${i === 0 ? '!bg-lime' : ''}`}><Icon name={i === 0 ? 'sparkles' : 'check'} size={12} strokeWidth={2.5} /></span>
+              <span className={`tdot ${i === 0 ? '!bg-accent !text-white' : ''}`}><Icon name={i === 0 ? 'sparkles' : 'check'} size={12} strokeWidth={2.5} /></span>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <time className="text-[13px] font-bold">{fmtLong(m.at)}</time>
-                <span className="t-meta inline-flex items-center gap-2">
+                <span className="inline-flex items-center gap-2 text-[13px] text-sub">
                   {m.channels.map(ch => <span key={ch} className="inline-flex items-center gap-1" title={`Sent by ${CHANNEL[ch].label}`}><Icon name={CHANNEL[ch].icon} size={12} />{CHANNEL[ch].label}</span>)}
                 </span>
               </div>
-              <p className={`mt-1 text-[15px] leading-relaxed ${i === 0 ? 'text-forest' : 'text-muted'}`}>{m.text}</p>
+              <p className={`mt-1 text-[15px] leading-relaxed ${i === 0 ? 'text-ink' : 'text-sub'}`}>{m.text}</p>
             </li>
           ))}
         </ol>
@@ -532,23 +522,23 @@ function MessageHistory({ messages }) {
 
 function SavedTests({ tests }) {
   return (
-    <section className="card">
+    <section className="card card-top md:!p-6">
       <SectionHead title="Saved test results" note="Valid for 2 weeks. A new role only tests the skills it adds." />
       {tests.length === 0 ? (
-        <p className="t-meta mt-4">No saved tests yet. Your Flexiple coding test appears here once you pass it.</p>
+        <p className="mt-4 text-[13px] text-sub">No saved tests right now. Tests you pass appear here for 2 weeks.</p>
       ) : (
         <ul className="mt-4 grid gap-3">
           {tests.map(t => (
-            <li key={t.name} className="flex items-start gap-3 rounded-[var(--r-small)] border border-line p-4">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-cream"><Icon name="award" size={18} /></span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="font-bold">{t.name}</p>
-                  <p className="num text-[15px] font-bold">{t.score}</p>
-                </div>
-                <p className="t-meta">Passed {fmtLong(t.passedAt)}</p>
-                <Chip tone="low" icon="check" className="mt-2">Valid until {fmtLong(t.validUntil)}</Chip>
+            <li key={t.name} className="overflow-hidden rounded-[10px] border border-line">
+              <div className="flex items-center gap-3 p-4">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-tint text-accent"><Icon name="award" size={18} /></span>
+                <p className="min-w-0 flex-1 font-bold">{t.name}</p>
+                <p className="num font-bold">{t.score}</p>
               </div>
+              <dl className="kv grid grid-cols-2 gap-4 bg-panel px-4 py-3">
+                <div><dt>Passed</dt><dd className="num !text-[13px]">{fmtLong(t.passedAt)}</dd></div>
+                <div><dt>Valid until</dt><dd className="num !text-[13px] !text-accent">{fmtLong(t.validUntil)}</dd></div>
+              </dl>
             </li>
           ))}
         </ul>
@@ -561,11 +551,15 @@ function CandidateView({ version, cid }) {
   const { data: c, loading } = useApi(() => api.getCandidate(cid), [cid, version]);
   if (!c) return <Skeleton lines={3} height={140} />;
   return (
-    <div className={`fade grid gap-8 ${loading ? 'is-loading' : ''}`}>
+    <div className={`fade grid gap-6 ${loading ? 'is-loading' : ''}`}>
+      <PageHead title="Your application" stats={<>
+        <DotStat tone={STATUS[c.status].tone}>{STATUS[c.status].label}</DotStat>
+        <DotStat tone="accent">{plural(c.messages.length, 'update')} received</DotStat>
+      </>} />
       {c.status !== 'active' && <OutcomeCard c={c} />}
       <StatusCard c={c} />
       <RoundTracker c={c} />
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <MessageHistory messages={c.messages} />
         <SavedTests tests={c.tests} />
       </div>
@@ -589,20 +583,20 @@ function Alerts({ version, busy, run }) {
       {!data ? <Skeleton lines={4} /> : shown.length === 0 ? (
         <Empty icon="check" title="Everyone is up to date" body="No candidate has gone a week without hearing from you." />
       ) : (
-        <ul className={`fade card !p-2 grid ${loading ? 'is-loading' : ''}`}>
+        <ul className={`fade card grid ${loading ? 'is-loading' : ''}`}>
           {shown.map((c, i) => (
-            <li key={c.id} className={`flex items-center gap-3 rounded-[var(--r-small)] p-3 transition hover:bg-[#FCF7F3] ${i ? 'border-t border-line' : ''}`}>
-              <Avatar name={c.name} />
+            <li key={c.id} className={`flex items-center gap-3 px-4 py-3.5 transition hover:bg-[#FCFCFC] ${i ? 'border-t border-line' : ''}`}>
+              <Avatar name={c.name} size={40} status={c.daysWaiting >= 8 ? 'bad' : 'good'} />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold">{c.name}</p>
-                <p className="t-meta truncate">{c.roundName} · {c.companyName}</p>
+                <p className="truncate text-[13px] text-sub">{c.roundName} · {c.companyName}</p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1.5">
                 <WaitChip days={c.daysWaiting} />
                 {c.pendingDraft
-                  ? <span className="inline-flex items-center gap-1 text-xs font-bold text-forest"><Icon name="check" size={12} strokeWidth={3} />Draft ready</span>
+                  ? <span className="inline-flex items-center gap-1 text-xs font-bold text-accent"><Icon name="check" size={12} strokeWidth={3} />Draft ready</span>
                   : <button type="button" disabled={!!busy} onClick={() => run('alert-' + c.id, () => api.draftMessage(c.id, 'check_in'), `Draft ready for ${c.name}`)}
-                      className="inline-flex items-center gap-1 rounded-full text-xs font-bold text-forest underline-offset-4 hover:underline disabled:opacity-40">
+                      className="inline-flex items-center gap-1 text-xs font-bold text-accent underline-offset-4 hover:underline disabled:opacity-40">
                       {busy === 'alert-' + c.id ? <span className="spinner !h-3 !w-3" /> : <Icon name="sparkles" size={12} />}Draft update
                     </button>}
               </div>
@@ -648,11 +642,11 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
 
   if (sent) {
     return (
-      <article className="card sent-flash flex items-center gap-3 !bg-[var(--low-bg)] !border-transparent">
-        <span className="pop grid h-9 w-9 place-items-center rounded-full bg-forest text-lime"><Icon name="check" size={18} strokeWidth={3} /></span>
+      <article className="card sent-flash flex items-center gap-3 !border-transparent !bg-[var(--good-tint)] p-5">
+        <span className="pop grid h-9 w-9 place-items-center rounded-full bg-accent text-white"><Icon name="check" size={18} strokeWidth={3} /></span>
         <div>
-          <p className="font-bold text-[var(--low-fg)]">Sent to {d.candidateName}</p>
-          <p className="t-meta">Added to {first}'s update history.</p>
+          <p className="font-bold text-accent">Sent to {d.candidateName}</p>
+          <p className="text-[13px] text-sub">Added to {first}'s update history.</p>
         </div>
       </article>
     );
@@ -660,76 +654,77 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
 
   return (
     <article className="card">
-      <div className="flex items-start gap-3">
-        <Avatar name={d.candidateName} size={40} />
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-            <h3 className="text-[15px] font-bold">{d.candidateName}</h3>
-            <Chip tone="cream">{d.eventLabel}</Chip>
+      <div className="card-top">
+        <div className="flex items-start gap-3">
+          <Avatar name={d.candidateName} size={48} status={d.guard.blocked ? 'bad' : 'good'} />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+              <h3 className="text-[17px] font-bold">{d.candidateName}</h3>
+              <Chip tone="accent">{d.eventLabel}</Chip>
+            </div>
+            <p className="truncate text-[13px] text-sub">{d.roleTitle} · {d.companyName}</p>
           </div>
-          <p className="t-meta truncate">{d.roleTitle} · {d.companyName}</p>
         </div>
-      </div>
-
-      <div className="mt-4">
-        <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold text-muted"><Icon name="sparkles" size={12} />AI draft from pipeline facts · {hoursAgo(d.createdAt)}</p>
+        <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-sub"><Icon name="sparkles" size={12} />AI draft from pipeline facts · {hoursAgo(d.createdAt)}</p>
         {editing ? (
           <textarea
             id={`draft-text-${d.id}`}
             aria-label={`Message to ${d.candidateName}`}
-            className="block w-full rounded-[var(--r-small)] border-2 border-forest bg-white p-3 text-[15px] leading-relaxed text-forest outline-none"
+            className="mt-2 block w-full rounded-[8px] border-2 border-accent bg-white p-3 text-[15px] leading-relaxed text-ink outline-none"
             rows={5}
             value={text}
             onChange={e => setText(e.target.value)}
             autoFocus
           />
         ) : (
-          <p className="well p-4 text-[15px] leading-relaxed">{text}</p>
+          <p className="mt-2 text-[15px] leading-relaxed">{text}</p>
         )}
-        {editing && !text.trim() && <p className="mt-1 text-xs font-bold text-rust">The message can't be empty.</p>}
+        {editing && !text.trim() && <p className="mt-1 text-xs font-bold text-bad">The message can't be empty.</p>}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="t-meta mr-1">Send by</span>
-        {CHANNELS.map(ch => {
-          const on = channels.includes(ch);
-          return (
-            <button
-              key={ch}
-              type="button"
-              aria-pressed={on}
-              title={on && channels.length === 1 ? 'At least one channel is needed' : `${on ? 'Remove' : 'Add'} ${CHANNEL[ch].label}`}
-              onClick={() => toggle(ch)}
-              className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] font-bold transition active:scale-[.97] ${on ? 'border-forest bg-forest text-lime' : 'border-line bg-white text-muted hover:border-forest hover:text-forest'}`}
-            >
-              <Icon name={on ? 'check' : CHANNEL[ch].icon} size={12} strokeWidth={on ? 3 : 2} />{CHANNEL[ch].label}
-            </button>
-          );
-        })}
-      </div>
-
-      {d.guard.blocked ? (
-        <div className="mt-4 flex gap-2 rounded-[var(--r-small)] bg-[var(--high-bg)] p-3 text-[13px] leading-relaxed text-[var(--high-fg)]" role="note">
-          <Icon name="alert" size={16} className="mt-0.5" />
-          <p><b>Weekly limit reached.</b> {d.guard.reason}</p>
+      <div className="card-panel grid gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-[13px] text-sub">Send by</span>
+          {CHANNELS.map(ch => {
+            const on = channels.includes(ch);
+            return (
+              <button
+                key={ch}
+                type="button"
+                aria-pressed={on}
+                title={on && channels.length === 1 ? 'At least one channel is needed' : `${on ? 'Remove' : 'Add'} ${CHANNEL[ch].label}`}
+                onClick={() => toggle(ch)}
+                className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[13px] font-bold transition active:scale-[.97] ${on ? 'border-accent bg-tint text-accent' : 'border-line bg-white text-sub hover:text-ink'}`}
+              >
+                <Icon name={on ? 'check' : CHANNEL[ch].icon} size={12} strokeWidth={on ? 3 : 2} />{CHANNEL[ch].label}
+              </button>
+            );
+          })}
         </div>
-      ) : (
-        <div className="mt-4 flex items-center gap-2">
-          <div className="bar w-16"><span style={{ width: `${(d.guard.sentThisWeek / 2) * 100}%` }} /></div>
-          <p className="t-meta">{d.guard.sentThisWeek} of 2 messages to {first} this week</p>
-        </div>
-      )}
 
-      <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-line pt-4">
-        <Btn icon="send" loading={busy === key} disabled={d.guard.blocked || (!!busy && busy !== key) || !text.trim()} onClick={approve}>
-          {busy === key ? 'Sending…' : `Approve and send to ${first}`}
-        </Btn>
-        {editing ? (
-          <Btn kind="secondary" icon="check" disabled={!!busy || !text.trim()} onClick={() => { setEditing(false); simple('edit-' + d.id, () => api.editDraft(d.id, { text, channels }), 'Draft saved'); }}>Save</Btn>
+        {d.guard.blocked ? (
+          <div className="flex gap-2 rounded-[8px] bg-[var(--bad-tint)] p-3 text-[13px] leading-relaxed text-[#B91C1C]" role="note">
+            <Icon name="alert" size={16} className="mt-0.5" />
+            <p><b>Weekly limit reached.</b> {d.guard.reason}</p>
+          </div>
         ) : (
-          <Btn kind="secondary" icon="pencil" disabled={!!busy} onClick={() => setEditing(true)}>Edit</Btn>
+          <div className="flex items-center gap-2">
+            <div className="bar w-16"><span style={{ width: `${(d.guard.sentThisWeek / 2) * 100}%` }} /></div>
+            <p className="text-[13px] text-sub">{d.guard.sentThisWeek} of 2 messages to {first} this week</p>
+          </div>
         )}
-        <Btn kind="quiet" icon="trash" disabled={!!busy} className="ml-auto" onClick={() => simple('discard-' + d.id, () => api.discardDraft(d.id), 'Draft discarded')}>Discard</Btn>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Btn icon="send" loading={busy === key} disabled={d.guard.blocked || (!!busy && busy !== key) || !text.trim()} onClick={approve}>
+            {busy === key ? 'Sending…' : `Approve and send to ${first}`}
+          </Btn>
+          {editing ? (
+            <Btn kind="secondary" icon="check" disabled={!!busy || !text.trim()} onClick={() => { setEditing(false); simple('edit-' + d.id, () => api.editDraft(d.id, { text, channels }), 'Draft saved'); }}>Save</Btn>
+          ) : (
+            <Btn kind="secondary" icon="pencil" disabled={!!busy} onClick={() => setEditing(true)}>Edit</Btn>
+          )}
+          <Btn kind="quiet" icon="trash" disabled={!!busy} className="ml-auto" onClick={() => simple('discard-' + d.id, () => api.discardDraft(d.id), 'Draft discarded')}>Discard</Btn>
+        </div>
       </div>
     </article>
   );
@@ -739,7 +734,7 @@ function Drafts({ version, bump, notify }) {
   const { data, loading } = useApi(() => api.getDrafts(), [version]);
   const [busy, setBusy] = useState(null);
   return (
-    <section className="grid content-start gap-4">
+    <section id="drafts" className="grid scroll-mt-28 content-start gap-4">
       <SectionHead title="Drafts to approve" count={data ? data.length : undefined} note="Nothing reaches a candidate until you approve it." />
       {!data ? <Skeleton lines={2} height={260} /> : data.length === 0 ? (
         <Empty icon="inbox" title="No drafts waiting" body="Moving a candidate, pausing a role or drafting a check-in creates one here." />
@@ -756,7 +751,7 @@ function RoundDots({ round, total, status }) {
   return (
     <span className="mt-1.5 flex gap-1" aria-hidden="true">
       {Array.from({ length: total }).map((_, i) => (
-        <span key={i} className={`h-1.5 w-4 rounded-full ${i < round ? 'bg-forest' : i === round ? (status === 'active' ? 'bg-lime ring-1 ring-forest' : 'bg-rust') : 'bg-line'}`} />
+        <span key={i} className={`h-1.5 w-4 rounded-full ${i < round ? 'bg-accent' : i === round ? (status === 'active' ? 'bg-accent/40' : 'bg-bad') : 'bg-[#E5E5E5]'}`} />
       ))}
     </span>
   );
@@ -781,10 +776,10 @@ function Pipeline({ version, busy, run }) {
               role="tab"
               aria-selected={on}
               onClick={() => setRid(r.id)}
-              className={`flex shrink-0 items-center gap-2 rounded-full border py-1.5 pl-4 pr-2 text-left text-[13px] font-bold transition active:scale-[.98] ${on ? 'border-forest bg-forest text-lime' : 'border-line bg-white text-forest hover:border-forest'}`}
+              className={`flex shrink-0 items-center gap-2 rounded-[8px] border py-1.5 pl-3 pr-1.5 text-left text-[13px] font-bold transition active:scale-[.98] ${on ? 'border-accent bg-tint text-accent' : 'border-line bg-white text-ink hover:border-[#D4D4D4]'}`}
             >
               <span className="whitespace-nowrap">{r.title}</span>
-              <span className={`num rounded-full px-2 text-xs leading-5 ${on ? 'bg-lime text-forest' : 'bg-cream'}`}>{r.activeCount}</span>
+              <span className={`num rounded-full px-2 text-xs leading-5 ${on ? 'bg-accent text-white' : 'bg-panel text-sub'}`}>{r.activeCount}</span>
             </button>
           );
         })}
@@ -792,11 +787,10 @@ function Pipeline({ version, busy, run }) {
 
       {role && (
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="t-meta inline-flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="inline-flex items-center gap-1.5"><Icon name="building" size={14} />{role.companyName}</span>
-            <span>{plural(role.rounds.length, 'round')}</span>
-            <span>{plural(role.activeCount, 'candidate')} in process</span>
-          </p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            <DotStat tone={role.status === 'paused' ? 'warn' : 'good'}>{role.status === 'paused' ? 'Paused' : 'Open'} · {role.companyName}</DotStat>
+            <DotStat tone="accent">{plural(role.activeCount, 'candidate')} in process</DotStat>
+          </div>
           <PauseControl role={role} busy={busy} run={run} />
         </div>
       )}
@@ -816,12 +810,12 @@ function Pipeline({ version, busy, run }) {
                   <tr key={c.id}>
                     <td>
                       <div className="flex min-w-[200px] items-center gap-3">
-                        <Avatar name={c.name} size={32} />
-                        <div className="min-w-0"><p className="font-bold">{c.name}</p><p className="t-meta">{c.city}</p></div>
+                        <Avatar name={c.name} size={36} status={active ? 'good' : STATUS[c.status].tone} />
+                        <div className="min-w-0"><p className="font-bold">{c.name}</p><p className="text-[13px] text-sub">{c.city}</p></div>
                       </div>
                     </td>
                     <td><p>{c.roundName}</p><RoundDots round={c.round} total={c.rounds.length} status={c.status} /></td>
-                    <td>{active ? <WaitChip days={c.daysWaiting} /> : <span className="t-meta">{ago(c.daysWaiting)}</span>}</td>
+                    <td>{active ? <WaitChip days={c.daysWaiting} /> : <span className="text-[13px] text-sub">{ago(c.daysWaiting)}</span>}</td>
                     <td><Chip tone={STATUS[c.status].tone}>{STATUS[c.status].label}</Chip></td>
                     <td>
                       {active ? (
@@ -836,7 +830,7 @@ function Pipeline({ version, busy, run }) {
                           )}
                           <Btn small kind="quiet" icon="x" disabled={!!busy} title={`Marks ${c.name} not selected and drafts the outcome`} onClick={() => run('reject-' + c.id, () => api.markNotSelected(c.id), `${c.name} marked not selected. Draft ready to approve.`)}>Not selected</Btn>
                         </div>
-                      ) : <span className="t-meta block text-right">No actions</span>}
+                      ) : <span className="block text-right text-[13px] text-sub">No actions</span>}
                     </td>
                   </tr>
                 );
@@ -851,10 +845,17 @@ function Pipeline({ version, busy, run }) {
 
 function RecruiterView({ version, bump, notify }) {
   const [busy, run] = useRunner(bump, notify);
+  const m = useApi(() => api.getMetrics(), [version]);
   return (
-    <div className="grid gap-10">
+    <div className="grid gap-8">
+      <PageHead title="Recruiter overview" stats={m.data && <>
+        <DotStat tone="good">In process {m.data.openCount}</DotStat>
+        <DotStat tone="bad">Waiting 8+ days {m.data.noUpdate8}</DotStat>
+      </>}>
+        <Btn kind="soft" icon="inbox" onClick={() => document.getElementById('drafts')?.scrollIntoView({ behavior: 'smooth' })}>Go to drafts</Btn>
+      </PageHead>
       <MetricsStrip version={version} />
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-8">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <Alerts version={version} busy={busy} run={run} />
         <Drafts version={version} bump={bump} notify={notify} />
       </div>
@@ -868,15 +869,15 @@ function RecruiterView({ version, bump, notify }) {
 function StageBars({ r }) {
   const max = Math.max(1, ...r.stageCounts);
   return (
-    <ol className="grid gap-2">
+    <ol className="grid gap-2.5">
       {r.rounds.map((name, i) => {
         const count = r.stageCounts[i];
         const wait = r.stageLongestWait[i];
         return (
-          <li key={name} className="grid grid-cols-[minmax(0,1fr)_88px_28px] items-center gap-3 text-[13px]">
-            <span className={`truncate ${count ? 'font-bold' : 'text-muted'}`}>{name}</span>
-            <span className="bar !h-2"><span style={{ width: `${(count / max) * 100}%`, background: count ? 'var(--forest)' : 'transparent' }} /></span>
-            <span className={`num text-right font-bold ${count ? '' : 'text-muted'}`} title={count ? `Longest wait in this round: ${plural(wait, 'day')}` : undefined}>{count}</span>
+          <li key={name} className="grid grid-cols-[minmax(0,1fr)_80px_24px] items-center gap-3 text-[13px]">
+            <span className={`truncate ${count ? 'font-bold text-ink' : 'text-sub'}`}>{name}</span>
+            <span className="bar"><span style={{ width: `${(count / max) * 100}%`, background: count ? 'var(--accent)' : 'transparent' }} /></span>
+            <span className={`num text-right font-bold ${count ? '' : 'text-sub'}`} title={count ? `Longest wait in this round: ${plural(wait, 'day')}` : undefined}>{count}</span>
           </li>
         );
       })}
@@ -891,37 +892,43 @@ function HiringBoard({ companyId, version, busy, run }) {
   return (
     <section className="grid gap-4">
       <SectionHead title="Your roles" note="Candidates in each round and how recently anyone moved.">
-        <div className="flex rounded-full border border-line bg-white p-1" role="radiogroup" aria-label="Layout">
+        <div className="flex rounded-[8px] border border-line bg-white p-1" role="radiogroup" aria-label="Layout">
           {[['cards', 'grid', 'Cards'], ['list', 'list', 'List']].map(([v, icon, label]) => (
             <button key={v} type="button" role="radio" aria-checked={layout === v} onClick={() => setLayout(v)}
-              className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] font-bold transition ${layout === v ? 'bg-forest text-lime' : 'text-muted hover:text-forest'}`}>
+              className={`inline-flex h-8 items-center gap-1.5 rounded-[6px] px-3 text-[13px] font-bold transition ${layout === v ? 'bg-tint text-accent' : 'text-sub hover:text-ink'}`}>
               <Icon name={icon} size={14} />{label}
             </button>
           ))}
         </div>
       </SectionHead>
       {!data ? <Skeleton lines={2} height={220} /> : layout === 'cards' ? (
-        <div className={`fade grid gap-4 md:grid-cols-2 ${loading ? 'is-loading' : ''}`}>
+        <div className={`fade grid gap-4 md:grid-cols-2 xl:grid-cols-3 ${loading ? 'is-loading' : ''}`}>
           {data.map(r => {
             const longest = Math.max(0, ...r.stageLongestWait.filter(x => x !== null));
             return (
-              <article key={r.id} className="card flex flex-col gap-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="t-h">{r.title}</h3>
-                    <p className="t-meta mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span className="inline-flex items-center gap-1"><Icon name="users" size={14} />{r.activeCount} in process</span>
-                      <span className="inline-flex items-center gap-1"><Icon name="clock" size={14} />moved {r.daysSinceMove === null ? 'never' : ago(r.daysSinceMove)}</span>
-                    </p>
+              <article key={r.id} className="card flex flex-col">
+                <div className="card-top flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-tint text-accent"><Icon name="briefcase" size={20} /></span>
+                    <div className="min-w-0">
+                      <h3 className="text-[17px] font-bold leading-snug">{r.title}</h3>
+                      <p className="text-[13px] text-sub">{plural(r.rounds.length, 'round')}</p>
+                    </div>
                   </div>
-                  {r.status === 'paused' ? <Chip tone="rust" icon="pause">Paused</Chip> : <Chip tone="lime">Open</Chip>}
+                  {r.status === 'paused' ? <Chip tone="warn" icon="pause">Paused</Chip> : <Chip tone="good">Open</Chip>}
                 </div>
-                <StageBars r={r} />
-                <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-                  <p className={`text-[13px] ${longest >= 8 ? 'font-bold text-rust' : 'text-muted'}`}>
-                    {r.activeCount ? `Longest wait: ${plural(longest, 'day')}` : r.offerCount ? plural(r.offerCount, 'offer') + ' out' : 'No one in process'}
-                  </p>
-                  <PauseControl role={r} busy={busy} run={run} compact />
+                <div className="card-panel flex flex-1 flex-col gap-4">
+                  <dl className="kv grid grid-cols-2 gap-4">
+                    <div><dt>In process</dt><dd className="num">{r.activeCount}</dd></div>
+                    <div><dt>Last movement</dt><dd>{r.daysSinceMove === null ? 'Never' : ago(r.daysSinceMove)}</dd></div>
+                  </dl>
+                  <StageBars r={r} />
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <p className={`text-[13px] ${longest >= 8 ? 'font-bold text-bad' : 'text-sub'}`}>
+                      {r.activeCount ? `Longest wait: ${plural(longest, 'day')}` : r.offerCount ? plural(r.offerCount, 'offer') + ' out' : 'No one in process'}
+                    </p>
+                    <PauseControl role={r} busy={busy} run={run} />
+                  </div>
                 </div>
               </article>
             );
@@ -934,12 +941,12 @@ function HiringBoard({ companyId, version, busy, run }) {
             <tbody>
               {data.map(r => (
                 <tr key={r.id}>
-                  <td><p className="font-bold">{r.title}</p><p className="t-meta">{plural(r.rounds.length, 'round')}</p></td>
+                  <td><p className="font-bold">{r.title}</p><p className="text-[13px] text-sub">{plural(r.rounds.length, 'round')}</p></td>
                   <td className="num font-bold">{r.activeCount}</td>
                   <td className="num">{r.offerCount}</td>
-                  <td className="t-meta">{r.daysSinceMove === null ? 'never' : ago(r.daysSinceMove)}</td>
-                  <td>{r.status === 'paused' ? <Chip tone="rust" icon="pause">Paused</Chip> : <Chip tone="lime">Open</Chip>}</td>
-                  <td className="text-right"><PauseControl role={r} busy={busy} run={run} compact /></td>
+                  <td className="text-[13px] text-sub">{r.daysSinceMove === null ? 'never' : ago(r.daysSinceMove)}</td>
+                  <td>{r.status === 'paused' ? <Chip tone="warn" icon="pause">Paused</Chip> : <Chip tone="good">Open</Chip>}</td>
+                  <td className="text-right"><PauseControl role={r} busy={busy} run={run} /></td>
                 </tr>
               ))}
             </tbody>
@@ -961,7 +968,7 @@ function OffersTable({ companyId, version, busy, run }) {
   return (
     <section className="grid gap-4">
       <SectionHead title="Offer-to-join tracker" note="Risk uses process signals only.">
-        <span className="t-meta inline-flex items-center gap-1.5"><Icon name="lock" size={14} />Visible to you and your recruiter. Never to candidates.</span>
+        <span className="inline-flex items-center gap-1.5 text-[13px] text-sub"><Icon name="lock" size={14} />Visible to you and your recruiter. Never to candidates.</span>
       </SectionHead>
       {data && data.length > 0 && (
         <FilterChips label="Filter by risk" value={filter} onChange={setFilter} options={[
@@ -986,26 +993,26 @@ function OffersTable({ companyId, version, busy, run }) {
                     <tr>
                       <td>
                         <div className="flex min-w-[200px] items-center gap-3">
-                          <Avatar name={o.candidateName} size={32} />
-                          <div className="min-w-0"><p className="font-bold">{o.candidateName}</p><p className="t-meta">{o.roleTitle}</p></div>
+                          <Avatar name={o.candidateName} size={36} status={RISK_TONE[o.risk.level]} />
+                          <div className="min-w-0"><p className="font-bold">{o.candidateName}</p><p className="text-[13px] text-sub">{o.roleTitle}</p></div>
                         </div>
                       </td>
                       <td>
                         <p className="num font-bold">{fmtLong(o.joiningDate)}</p>
                         {pushed && (
-                          <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-bold text-rust" title="Joining date was pushed back">
+                          <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-bold text-bad" title="Joining date was pushed back">
                             <span className="line-through decoration-1">{fmt(o.originalJoiningDate)}</span><Icon name="arrowRight" size={12} />{fmt(o.joiningDate)}
                           </p>
                         )}
                       </td>
                       <td className="min-w-[150px]">
-                        <p className="num"><b>{plural(o.daysLeft, 'day')}</b> <span className="t-meta">left</span></p>
+                        <p className="num"><b>{plural(o.daysLeft, 'day')}</b> <span className="text-[13px] text-sub">left</span></p>
                         <div className="bar mt-2" title={`${Math.round(elapsed)}% of the ${o.noticeDays}-day notice served`}><span style={{ width: `${elapsed}%` }} /></div>
                       </td>
-                      <td><p className="num">{fmt(o.lastContactAt)}</p><p className="t-meta">reply {fmt(o.lastReplyAt)}</p></td>
+                      <td><p className="num">{fmt(o.lastContactAt)}</p><p className="text-[13px] text-sub">reply {fmt(o.lastReplyAt)}</p></td>
                       <td className="min-w-[190px]">
                         <RiskChip level={o.risk.level} />
-                        {o.risk.signals.length > 0 && <ul className="mt-2 grid gap-0.5 text-[13px] text-muted">{o.risk.signals.map(s => <li key={s}>{s}</li>)}</ul>}
+                        {o.risk.signals.length > 0 && <ul className="mt-2 grid gap-0.5 text-[13px] text-sub">{o.risk.signals.map(s => <li key={s}>{s}</li>)}</ul>}
                       </td>
                       <td>
                         <div className="flex flex-col items-end gap-2">
@@ -1015,7 +1022,7 @@ function OffersTable({ companyId, version, busy, run }) {
                           </Btn>
                           {o.risk.level === 'High' && o.runnerUp && (
                             <button type="button" aria-expanded={openBackup === o.candidateId} onClick={() => setOpenBackup(openBackup === o.candidateId ? null : o.candidateId)}
-                              className="sent-flash inline-flex h-8 items-center gap-1.5 rounded-full bg-lime px-3 text-[13px] font-bold text-forest transition hover:brightness-95 active:scale-[.97]">
+                              className="sent-flash inline-flex h-8 items-center gap-1.5 rounded-[8px] border border-accent/30 bg-tint px-3 text-[13px] font-bold text-accent transition hover:border-accent active:scale-[.97]">
                               <Icon name="userCheck" size={14} />Backup ready<Icon name={openBackup === o.candidateId ? 'chevronUp' : 'chevronDown'} size={14} />
                             </button>
                           )}
@@ -1024,12 +1031,12 @@ function OffersTable({ companyId, version, busy, run }) {
                     </tr>
                     {openBackup === o.candidateId && o.runnerUp && (
                       <tr>
-                        <td colSpan={6} className="!bg-cream">
+                        <td colSpan={6} className="!bg-panel">
                           <div className="flex flex-wrap items-center gap-3">
-                            <Avatar name={o.runnerUp.name} size={32} />
+                            <Avatar name={o.runnerUp.name} size={36} status="good" />
                             <div className="min-w-0 flex-1">
-                              <p className="font-bold">{o.runnerUp.name} <span className="t-meta font-normal">· runner-up, {o.runnerUp.city}</span></p>
-                              <p className="t-meta">At {o.runnerUp.roundName}, round {o.runnerUp.round + 1} of {o.runnerUp.rounds.length} · {STATUS[o.runnerUp.status].label.toLowerCase()} · last update {ago(o.runnerUp.daysWaiting)}</p>
+                              <p className="font-bold">{o.runnerUp.name} <span className="text-[13px] font-normal text-sub">· runner-up, {o.runnerUp.city}</span></p>
+                              <p className="text-[13px] text-sub">At {o.runnerUp.roundName}, round {o.runnerUp.round + 1} of {o.runnerUp.rounds.length} · {STATUS[o.runnerUp.status].label.toLowerCase()} · last update {ago(o.runnerUp.daysWaiting)}</p>
                             </div>
                           </div>
                         </td>
@@ -1046,10 +1053,15 @@ function OffersTable({ companyId, version, busy, run }) {
   );
 }
 
-function ClientView({ version, bump, notify, companyId }) {
+function ClientView({ version, bump, notify, companyId, company }) {
   const [busy, run] = useRunner(bump, notify);
+  const m = useApi(() => api.getMetrics(companyId), [companyId, version]);
   return (
-    <div className="grid gap-10">
+    <div className="grid gap-8">
+      <PageHead title={company ? company.name : 'Company'} stats={m.data && <>
+        <DotStat tone="good">In process {m.data.openCount}</DotStat>
+        <DotStat tone="bad">Offers at risk {m.data.atRisk}</DotStat>
+      </>} />
       <MetricsStrip companyId={companyId} version={version} />
       <OffersTable companyId={companyId} version={version} busy={busy} run={run} />
       <HiringBoard companyId={companyId} version={version} busy={busy} run={run} />
@@ -1060,10 +1072,39 @@ function ClientView({ version, bump, notify, companyId }) {
 /* ================= APP SHELL ================= */
 
 const VIEWS = [
-  { key: 'candidate', label: 'Candidate', icon: 'user' },
-  { key: 'client', label: 'Client', icon: 'building' },
-  { key: 'recruiter', label: 'Recruiter', icon: 'briefcase' },
+  { key: 'candidate', label: 'Candidate view', short: 'Candidate', icon: 'user' },
+  { key: 'client', label: 'Client view', short: 'Client', icon: 'building' },
+  { key: 'recruiter', label: 'Recruiter view', short: 'Recruiter', icon: 'briefcase' },
 ];
+
+function Logo() {
+  return (
+    <p className="flex items-center gap-2">
+      <span className="grid h-8 w-8 place-items-center rounded-[8px] bg-accent text-sm font-bold text-white" aria-hidden="true">f</span>
+      <span className="leading-tight">
+        <span className="block text-lg font-bold text-accent">flexiple</span>
+        <span className="block text-[11px] text-sub">Hiring Hub</span>
+      </span>
+    </p>
+  );
+}
+
+function ViewPicker({ id, label, value, onChange, options }) {
+  return (
+    <div className="relative min-w-0">
+      <label htmlFor={id} className="sr-only">{label}</label>
+      <select
+        id={id}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="h-10 w-full max-w-full cursor-pointer appearance-none truncate rounded-[8px] border border-accent/30 bg-tint pl-3 pr-9 text-sm font-bold text-accent transition hover:border-accent sm:w-auto sm:max-w-[320px]"
+      >
+        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+      <Icon name="chevronDown" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-accent" />
+    </div>
+  );
+}
 
 function App() {
   const fromHash = location.hash.slice(1);
@@ -1094,91 +1135,115 @@ function App() {
   const reset = async () => { await api.resetDemo(); bump(); notify('Demo data reset'); };
 
   const co = ctx.data && ctx.data.companies.find(c => c.id === companyId);
+  const cand = cands.data && cands.data.find(c => c.id === cid);
+  const who = {
+    candidate: { name: cand ? cand.name : '…', sub: cand ? `${cand.city} · candidate` : '' },
+    client: { name: co ? co.hrLead : '…', sub: co ? `${co.hrTitle} · ${co.name}` : '' },
+    recruiter: { name: 'Priya Raman', sub: 'Flexiple recruiter' },
+  }[view];
   const props = { version, bump, notify };
 
+  const navItem = (v, mobile) => {
+    const on = view === v.key;
+    return (
+      <button
+        key={v.key}
+        type="button"
+        role="tab"
+        aria-selected={on}
+        onClick={() => go(v.key)}
+        className={mobile
+          ? `relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[8px] px-3 text-[13px] font-bold transition ${on ? 'bg-tint text-accent' : 'text-sub hover:text-ink'}`
+          : `relative flex h-11 w-full items-center gap-3 rounded-[8px] px-4 text-[15px] transition ${on ? 'bg-tint font-bold text-accent' : 'text-ink hover:bg-panel'}`}
+      >
+        {on && !mobile && <span className="absolute -left-4 top-1 bottom-1 w-[3px] rounded-r bg-accent" aria-hidden="true" />}
+        <Icon name={v.icon} size={mobile ? 16 : 18} />
+        <span className="flex-1 text-left">{mobile ? v.short : v.label}</span>
+        {v.key === 'recruiter' && pending > 0 && (
+          <span key={pending} className="pop num grid h-5 min-w-5 place-items-center rounded-full bg-bad px-1 text-[11px] font-bold text-white" aria-label={`${pending} drafts to approve`}>{pending}</span>
+        )}
+      </button>
+    );
+  };
+
   return (
-    <>
-      <header className="site-header border-b border-white/10 bg-forest">
-        <div className="gutter mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 sm:h-16 sm:flex-nowrap sm:py-0">
-          <p className="flex items-baseline gap-2">
-            <span className="text-xl font-bold tracking-tight text-lime">flexiple</span>
-            <span className="text-[13px] text-cream">Hiring Hub</span>
-          </p>
-          <nav role="tablist" aria-label="Switch view" className="grid w-full grid-cols-3 rounded-full bg-white/10 p-1 sm:flex sm:w-auto">
-            {VIEWS.map(v => {
-              const on = view === v.key;
-              return (
-                <button
-                  key={v.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={on}
-                  onClick={() => go(v.key)}
-                  className={`relative inline-flex h-9 items-center justify-center gap-1.5 rounded-full px-2 text-[13px] font-bold transition active:scale-[.97] sm:px-4 ${on ? 'bg-lime text-forest' : 'text-cream hover:bg-white/10'}`}
-                >
-                  <Icon name={v.icon} size={16} />
-                  {v.label}
-                  {v.key === 'recruiter' && pending > 0 && (
-                    <span key={pending} className="pop num ml-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-rust px-1 text-[11px] text-white" aria-label={`${pending} drafts to approve`}>{pending}</span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-      </header>
-
-      <section className="bg-forest">
-        <div className="gutter mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-x-8 gap-y-5 pb-8 pt-6 md:pb-10 md:pt-8">
-          <div className="min-w-0 max-w-xl">
-            <h1 className="text-[28px] font-bold leading-[1.1] tracking-[-0.025em] text-cream md:text-[36px]" style={{ textWrap: 'balance' }}>
-              Hiring <span className="text-lime">Hub</span>
-            </h1>
+    <div className="lg:flex">
+      <aside className="sidebar hidden w-[248px] shrink-0 flex-col border-r border-line bg-white lg:flex">
+        <div className="flex h-[76px] items-center border-b border-line px-6"><Logo /></div>
+        <nav className="flex-1 overflow-y-auto px-4 py-6" aria-label="Views">
+          <p className="mb-2 px-4 text-[13px] text-sub">Main</p>
+          <div role="tablist" aria-label="Switch view" className="grid gap-1">{VIEWS.map(v => navItem(v, false))}</div>
+        </nav>
+        <div className="p-4">
+          <div className="rounded-[12px] bg-tint p-5 text-center">
+            <span className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-accent text-white"><Icon name="info" size={20} /></span>
+            <p className="mt-3 font-bold">Prototype</p>
+            <p className="mt-1 text-xs text-sub">Sample data and a simulated API. No messages are really sent.</p>
+            <Btn small className="mt-4 w-full" icon="refresh" onClick={reset}>Reset demo data</Btn>
           </div>
-          {view === 'candidate' && (
-            <HeroPicker id="candidate-picker" label="Viewing as" value={cid} onChange={setCid}
-              options={(cands.data || [{ id: cid, name: 'Loading…', roleTitle: '' }]).map(x => ({ value: x.id, label: x.roleTitle ? `${x.name} · ${x.roleTitle}` : x.name }))} />
-          )}
-          {view === 'client' && (
-            <div className="flex flex-col gap-2">
-              <HeroPicker id="company-picker" label="Company" value={companyId} onChange={setCompanyId}
-                options={(ctx.data ? ctx.data.companies : [{ id: 'c1', name: 'Loading…' }]).map(c => ({ value: c.id, label: c.name }))} />
-              {co && <p className="text-[13px] text-cream/80">Signed in as <b className="text-cream">{co.hrLead}</b>, {co.hrTitle}</p>}
-            </div>
-          )}
-          {view === 'recruiter' && (
-            <div className="flex items-center gap-3 rounded-full bg-white/10 py-1.5 pl-1.5 pr-4">
-              <Avatar name="Priya Raman" size={36} />
-              <div><p className="text-[13px] font-bold text-cream">Priya Raman</p><p className="text-xs text-cream/70">Flexiple recruiter</p></div>
-            </div>
-          )}
         </div>
-      </section>
+      </aside>
 
-      <main className="gutter mx-auto max-w-6xl py-8 md:py-10">
-        {view === 'candidate' && <CandidateView {...props} cid={cid} />}
-        {view === 'client' && <ClientView {...props} companyId={companyId} />}
-        {view === 'recruiter' && <RecruiterView {...props} />}
-      </main>
+      <div className="min-w-0 flex-1">
+        <header className="topbar border-b border-line bg-white">
+          <div className="gutter flex min-h-[76px] flex-wrap items-center justify-between gap-x-4 gap-y-3 py-3">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="lg:hidden"><Logo /></div>
+              <div className="hidden min-w-0 lg:block">
+                <h1 className="truncate text-xl font-bold leading-tight">{who.name}</h1>
+                <p className="truncate text-[13px] text-sub">{who.sub}</p>
+              </div>
+            </div>
+            <div className="flex min-w-0 items-center gap-3">
+              {view === 'candidate' && (
+                <ViewPicker id="candidate-picker" label="Viewing as" value={cid} onChange={setCid}
+                  options={(cands.data || [{ id: cid, name: 'Loading…', roleTitle: '' }]).map(x => ({ value: x.id, label: x.roleTitle ? `${x.name} · ${x.roleTitle}` : x.name }))} />
+              )}
+              {view === 'client' && (
+                <ViewPicker id="company-picker" label="Company" value={companyId} onChange={setCompanyId}
+                  options={(ctx.data ? ctx.data.companies : [{ id: 'c1', name: 'Loading…' }]).map(c => ({ value: c.id, label: c.name }))} />
+              )}
+              {view === 'recruiter' && (
+                <button type="button" onClick={() => document.getElementById('drafts')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="relative grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-ink transition hover:bg-panel" title={pending ? `${pending} drafts to approve` : 'No drafts waiting'} aria-label="Drafts to approve">
+                  <Icon name="bell" size={18} />
+                  {pending > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-bad" aria-hidden="true" />}
+                </button>
+              )}
+              <Avatar name={who.name === '…' ? 'Hiring Hub' : who.name} size={40} />
+            </div>
+          </div>
+          <div className="gutter flex gap-1 overflow-x-auto border-t border-line py-2 lg:hidden" role="tablist" aria-label="Switch view">
+            {VIEWS.map(v => navItem(v, true))}
+          </div>
+        </header>
 
-      <footer className="border-t border-line">
-        <div className="gutter mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 py-6">
-          <p className="t-meta">Prototype with sample data and a simulated API. No messages are really sent.</p>
-          <Btn small kind="quiet" icon="refresh" onClick={reset}>Reset demo data</Btn>
-        </div>
-      </footer>
+        <main className="gutter py-6 md:py-8">
+          <div className="mb-6 lg:hidden">
+            <p className="text-lg font-bold">{who.name}</p>
+            <p className="text-[13px] text-sub">{who.sub}</p>
+          </div>
+          {view === 'candidate' && <CandidateView {...props} cid={cid} />}
+          {view === 'client' && <ClientView {...props} companyId={companyId} company={co} />}
+          {view === 'recruiter' && <RecruiterView {...props} />}
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 lg:hidden">
+            <p className="text-[13px] text-sub">Prototype with sample data. No messages are really sent.</p>
+            <Btn small kind="secondary" icon="refresh" onClick={reset}>Reset demo data</Btn>
+          </div>
+        </main>
+      </div>
 
       <div aria-live="polite">
         {toast && (
-          <div key={toast.key} role="status" className={`toast flex items-center gap-2 rounded-full py-3 pl-3 pr-5 text-sm font-bold ${toast.tone === 'error' ? 'bg-rust text-white' : 'bg-forest text-cream'}`}>
-            <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full ${toast.tone === 'error' ? 'bg-white/20' : 'bg-lime text-forest'}`}>
+          <div key={toast.key} role="status" className={`toast flex items-center gap-2 rounded-[10px] py-3 pl-3 pr-5 text-sm font-bold ${toast.tone === 'error' ? 'bg-bad text-white' : 'bg-accent text-white'}`}>
+            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/20">
               <Icon name={toast.tone === 'error' ? 'alert' : 'check'} size={14} strokeWidth={3} />
             </span>
             <span className="min-w-0">{toast.text}</span>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
