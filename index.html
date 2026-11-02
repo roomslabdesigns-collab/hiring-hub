@@ -5,30 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 </head>
 <body>
-<title>Flexiple Hiring Hub</title>
+<title>Hiring Hub</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <style>
-  /* Layout: dark brand sidebar and top bar, light working area with white cards whose details sit in a
-     pale brand panel. Tokens follow the Flexiple app design system (app.flexiple.com): Geist, a teal-green
-     brand scale at hue 175, a lime accent, green-tinted greys, 16px cards and 10px controls. */
+  /* Layout: black sidebar and top bar, white working area with white cards whose details sit in a light
+     grey panel. Colours follow strongyes.co: black chrome, white page, soft pink for active states, green
+     tags, and the violet → magenta → pink → orange logo gradient for primary actions and progress. */
   :root {
-    --accent: oklch(26% .05 175);        /* dark brand panel: sidebar, top bar, solid chips */
-    --accent-hover: oklch(32% .06 175);
-    --lime: oklch(84% .223 132);         /* accent-300 */
-    --cream: oklch(94.5% .003 175);      /* light text on the dark brand */
-    --tint: oklch(93% .031 175);         /* brand-100 */
-    --ink: oklch(23.5% .006 175);        /* gray-900 */
-    --sub: oklch(43% .003 175);          /* gray-500 */
-    --line: oklch(90% .003 175);         /* gray-100 */
-    --panel: oklch(96.5% .016 175);      /* brand-50 */
-    --page: oklch(98% .003 175);         /* gray-25 */
-    --white: oklch(100% 0 0);
-    --good: oklch(58.6% .1429 155.2); --good-tint: oklch(95.8% .041 156.4);
-    --warn: oklch(53.9% .1562 43);     --warn-tint: oklch(95.6% .0552 91.4);
-    --bad: oklch(57.6% .2088 29.5);    --bad-tint: oklch(93.9% .0288 23);
+    --accent: #030E14;                   /* near-black: sidebar, top bar, solid chips */
+    --accent-hover: #1A2730;
+    --lime: #EDB8D7;                     /* soft pink: active nav, current round, avatars */
+    --cream: #F2F2F2;                    /* light text on black */
+    --tint: #FBEAF3;                     /* pale pink */
+    --ink: #030E14;
+    --sub: #5D5D5D;
+    --line: #E4E4E4;
+    --panel: #F7F6F6;
+    --page: #FFFFFF;
+    --white: #FFFFFF;
+    --brand-gradient: linear-gradient(90deg, #735DFE 0%, #F85FF5 45%, #FF69A9 75%, #FE7B43 100%);
+    --good: #4E8F2C; --good-tint: #EAF5E2;
+    --warn: #B45309; --warn-tint: #FEF3E2;
+    --bad: #DA394D;  --bad-tint: #FBE7EA;
     --r-card: 16px;
     --r-btn: 10px;
     --shadow: 0 1px 2px oklch(0% 0 0 / .04), 0 4px 14px oklch(0% 0 0 / .04);
@@ -60,7 +61,7 @@
   .is-loading { opacity: .55; }
   .spinner { width: 14px; height: 14px; border-radius: 999px; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .skeleton { background: linear-gradient(90deg, oklch(94.5% .003 175) 0%, oklch(98% .003 175) 50%, oklch(94.5% .003 175) 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
+  .skeleton { background: linear-gradient(90deg, #EFEEEE 0%, #F7F6F6 50%, #EFEEEE 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
   @keyframes shimmer { to { background-position: -200% 0; } }
 
   .timeline { list-style: none; margin: 0; padding: 0; }
@@ -77,7 +78,7 @@
   .table-wrap tbody tr:hover { background: var(--page); }
 
   .bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
-  .bar > span { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .4s ease; }
+  .bar > span { display: block; height: 100%; border-radius: 999px; background: var(--brand-gradient); transition: width .4s ease; }
 
   .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 50; max-width: calc(100% - 32px); width: max-content; transform: translateX(-50%); animation: toast-in .28s cubic-bezier(.2, .8, .2, 1); box-shadow: 0 8px 32px rgba(20, 20, 20, .18); }
   @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
@@ -98,10 +99,9 @@
     theme: {
       extend: {
         colors: {
-          accent: 'oklch(26% .05 175 / <alpha-value>)', lime: 'oklch(84% .223 132 / <alpha-value>)', cream: 'oklch(94.5% .003 175 / <alpha-value>)',
-          tint: 'oklch(93% .031 175 / <alpha-value>)', ink: 'oklch(23.5% .006 175 / <alpha-value>)', sub: 'oklch(43% .003 175 / <alpha-value>)',
-          line: 'oklch(90% .003 175 / <alpha-value>)', panel: 'oklch(96.5% .016 175 / <alpha-value>)', page: 'oklch(98% .003 175 / <alpha-value>)',
-          good: 'oklch(58.6% .1429 155.2 / <alpha-value>)', bad: 'oklch(57.6% .2088 29.5 / <alpha-value>)', warn: 'oklch(53.9% .1562 43 / <alpha-value>)',
+          accent: '#030E14', lime: '#EDB8D7', cream: '#F2F2F2', tint: '#FBEAF3', ink: '#030E14', sub: '#5D5D5D',
+          line: '#E4E4E4', panel: '#F7F6F6', page: '#FFFFFF', good: '#4E8F2C', bad: '#DA394D', warn: '#B45309',
+          violet: '#735DFE', magenta: '#F85FF5', tag: '#A7D686',
         },
         fontFamily: { sans: ['Geist', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'], mono: ['Geist Mono', 'ui-monospace', 'monospace'] },
         fontWeight: { bold: '600' },
@@ -230,7 +230,7 @@ function Icon({ name, size = 16, className = '', strokeWidth = 2 }) {
 function Btn({ kind = 'primary', small, icon, loading, className = '', children, ...props }) {
   const size = small ? 'h-8 px-3 text-[13px] gap-1.5' : 'h-10 px-4 text-sm gap-2';
   const look = {
-    primary: 'bg-lime text-ink border border-[oklch(78%_.21_132)] shadow-[0_1px_2px_oklch(0%_0_0/.08)] hover:bg-[oklch(78%_.21_132)]',
+    primary: 'bg-[image:var(--brand-gradient)] text-white border border-transparent shadow-[0_1px_2px_rgba(0,0,0,.12)] hover:brightness-105',
     secondary: 'bg-white text-ink border border-line hover:border-accent/30 hover:bg-page',
     soft: 'bg-tint text-accent border border-accent/20 hover:border-accent',
     quiet: 'text-sub hover:text-ink hover:bg-tint',
@@ -253,9 +253,9 @@ function Chip({ tone = 'neutral', icon, children, className = '', title }) {
     neutral: 'bg-white text-sub border border-line',
     accent: 'bg-tint text-accent',
     solid: 'bg-accent text-lime',
-    good: 'bg-[var(--good-tint)] text-[oklch(49.9%_.1168_157.1)]',
+    good: 'bg-[#DDEFCF] text-[#3B6E1F]',
     warn: 'bg-[var(--warn-tint)] text-[var(--warn)]',
-    bad: 'bg-[var(--bad-tint)] text-[oklch(50%_.1821_29.5)]',
+    bad: 'bg-[var(--bad-tint)] text-[#B4283C]',
   }[tone];
   return (
     <span title={title} className={`inline-flex h-6 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-xs font-bold ${look} ${className}`}>
@@ -481,7 +481,7 @@ function OutcomeCard({ c }) {
   const n = c.rounds.length;
   const content = {
     paused: { icon: 'pause', tone: 'warn', chip: 'Role paused', title: 'This role is on hold', body: `${c.companyName} paused hiring for this role, so your application is closed for now. You reached ${c.roundName}, round ${c.round + 1} of ${n}.` },
-    rejected: { icon: 'flag', tone: 'bad', chip: 'Not selected', title: 'Not selected for this role', body: `${c.companyName} decided not to move forward after ${c.roundName}. Your saved test results still count for other Flexiple roles.` },
+    rejected: { icon: 'flag', tone: 'bad', chip: 'Not selected', title: 'Not selected for this role', body: `${c.companyName} decided not to move forward after ${c.roundName}. Your saved test results still count for other roles.` },
     offer: { icon: 'award', tone: 'good', chip: 'Offer', title: `${c.companyName} has made you an offer`, body: `You cleared all ${n} rounds. Your recruiter will go through the offer with you.` },
     accepted: c.offer && { icon: 'calendar', tone: 'good', chip: 'Offer accepted', title: `You join ${c.companyName} on ${fmtLong(c.offer.joiningDate)}`, body: `${plural(c.offer.daysLeft, 'day')} to go. Your recruiter stays in touch until Day 1.` },
     joined: { icon: 'userCheck', tone: 'good', chip: 'Joined', title: `You joined ${c.companyName}`, body: 'Your hiring process is complete.' },
@@ -504,7 +504,7 @@ function MessageHistory({ messages }) {
   const shown = all ? messages : messages.slice(0, 3);
   return (
     <section className="card card-top">
-      <SectionHead title="Updates from Flexiple" count={messages.length} />
+      <SectionHead title="Updates from your recruiter" count={messages.length} />
       {messages.length === 0 ? (
         <p className="mt-3 text-[13px] text-sub">No updates yet. Your first one arrives after your profile review.</p>
       ) : (
@@ -710,7 +710,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
         </div>
 
         {d.guard.blocked ? (
-          <div className="flex gap-2 rounded-[10px] bg-[var(--bad-tint)] p-3 text-[13px] leading-relaxed text-[oklch(50%_.1821_29.5)]" role="note">
+          <div className="flex gap-2 rounded-[10px] bg-[var(--bad-tint)] p-3 text-[13px] leading-relaxed text-[#B4283C]" role="note">
             <Icon name="alert" size={16} className="mt-0.5" />
             <p><b>Weekly limit reached.</b> {d.guard.reason}</p>
           </div>
@@ -883,7 +883,7 @@ function StageBars({ r }) {
         return (
           <li key={name} className="grid grid-cols-[minmax(0,1fr)_80px_24px] items-center gap-3 text-[13px]">
             <span className={`truncate ${count ? 'font-bold text-ink' : 'text-sub'}`}>{name}</span>
-            <span className="bar"><span style={{ width: `${(count / max) * 100}%`, background: count ? 'var(--accent)' : 'transparent' }} /></span>
+            <span className="bar"><span style={{ width: `${(count / max) * 100}%`, background: count ? 'var(--brand-gradient)' : 'transparent' }} /></span>
             <span className={`num text-right font-bold ${count ? '' : 'text-sub'}`} title={count ? `Longest wait in this round: ${plural(wait, 'day')}` : undefined}>{count}</span>
           </li>
         );
@@ -1080,10 +1080,10 @@ const VIEWS = [
 function Logo() {
   return (
     <p className="flex items-center gap-2">
-      <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-lime text-sm font-bold text-accent" aria-hidden="true">f</span>
+      <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[image:var(--brand-gradient)] text-sm font-bold text-white" aria-hidden="true">H</span>
       <span className="leading-tight">
-        <span className="block text-lg font-bold text-lime">flexiple</span>
-        <span className="block text-[11px] text-cream/70">Hiring Hub</span>
+        <span className="block text-lg font-bold text-white">Hiring Hub</span>
+        <span className="block text-[11px] text-cream/70">Interview to Day 1</span>
       </span>
     </p>
   );
@@ -1139,7 +1139,7 @@ function App() {
   const who = {
     candidate: { name: cand ? cand.name : '…', sub: cand ? `${cand.city} · candidate` : '' },
     client: { name: co ? co.hrLead : '…', sub: co ? `${co.hrTitle} · ${co.name}` : '' },
-    recruiter: { name: 'Priya Raman', sub: 'Flexiple recruiter' },
+    recruiter: { name: 'Priya Raman', sub: 'Recruiter' },
   }[view];
   const props = { version, bump, notify };
 

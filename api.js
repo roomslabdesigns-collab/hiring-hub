@@ -1,5 +1,5 @@
 /*
- * Flexiple Hiring Hub: mock API.
+ * Hiring Hub: mock API.
  *
  * In-memory data with a 300-500 ms delay on every call. The UI talks only to
  * window.HubAPI, so a real backend can replace this file one function at a
@@ -120,7 +120,7 @@
           `You reached ${at(c.round)}. We'll message you if the role reopens.`;
       case 'not_selected': {
         const tests = validTests(c);
-        const keep = tests.length ? ` Your passed tests stay valid until ${fmtLong(tests[0].validUntil)} for other Flexiple roles.` : '';
+        const keep = tests.length ? ` Your passed tests stay valid until ${fmtLong(tests[0].validUntil)} for other roles.` : '';
         return `Hi ${first}, ${co.name} has decided not to move forward with your application for the ${role.title} role ` +
           `after ${role.rounds[c.round]}.${keep}`;
       }
@@ -164,21 +164,21 @@
       { id: 'c2', name: 'Lumen Health', blurb: 'Health tech · Boston', hrLead: 'David Osei', hrTitle: 'HR Lead' },
       { id: 'c3', name: 'Brightpath Logistics', blurb: 'Logistics software · Austin', hrLead: 'Maria Lopez', hrTitle: 'Talent Lead' },
     ];
-    const recruiter = { name: 'Priya Raman', title: 'Flexiple recruiter' };
+    const recruiter = { name: 'Priya Raman', title: 'Recruiter' };
 
     const roles = [
       { id: 'r1', companyId: 'c1', title: 'Senior Backend Engineer (Node.js)', test: 'Node.js coding test', noticeDays: 60,
-        rounds: ['Profile review', 'Flexiple coding test', 'Recruiter call', 'Technical interview 1', 'System design', 'Hiring manager', 'Founder chat'] },
+        rounds: ['Profile review', 'Coding test', 'Recruiter call', 'Technical interview 1', 'System design', 'Hiring manager', 'Founder chat'] },
       { id: 'r2', companyId: 'c1', title: 'Frontend Engineer (React)', test: 'React coding test', noticeDays: 90,
-        rounds: ['Profile review', 'Flexiple coding test', 'Take-home task', 'Technical interview', 'Hiring manager'] },
+        rounds: ['Profile review', 'Coding test', 'Take-home task', 'Technical interview', 'Hiring manager'] },
       { id: 'r3', companyId: 'c2', title: 'Data Engineer (Python, Spark)', test: 'Python and SQL test', noticeDays: 60,
-        rounds: ['Profile review', 'Flexiple coding test', 'SQL round', 'Pipeline design', 'Team interview', 'Hiring manager'] },
+        rounds: ['Profile review', 'Coding test', 'SQL round', 'Pipeline design', 'Team interview', 'Hiring manager'] },
       { id: 'r4', companyId: 'c2', title: 'DevOps Engineer (AWS)', test: 'Cloud and Linux test', noticeDays: 90,
-        rounds: ['Profile review', 'Flexiple coding test', 'Infra deep dive', 'Team interview', 'Hiring manager'] },
+        rounds: ['Profile review', 'Coding test', 'Infra deep dive', 'Team interview', 'Hiring manager'] },
       { id: 'r5', companyId: 'c3', title: 'Full-stack Engineer (Django, React)', test: 'Python and React test', noticeDays: 60,
-        rounds: ['Profile review', 'Flexiple coding test', 'Pair programming', 'System design', 'Team interview', 'CTO chat'] },
+        rounds: ['Profile review', 'Coding test', 'Pair programming', 'System design', 'Team interview', 'CTO chat'] },
       { id: 'r6', companyId: 'c3', title: 'Android Engineer (Kotlin)', test: 'Kotlin coding test', noticeDays: 90,
-        rounds: ['Profile review', 'Flexiple coding test', 'Technical interview', 'Hiring manager', 'Founder chat'] },
+        rounds: ['Profile review', 'Coding test', 'Technical interview', 'Hiring manager', 'Founder chat'] },
     ].map(r => ({ ...r, status: 'open', pausedAt: null }));
 
     // [id, name, city, roleId, round, status, lastUpdateAgo, lastMovedAgo, nextUpdateIn, outcomeSent]
@@ -272,7 +272,7 @@
     const k8 = candOf('k8');
     const k8Snapshot = { ...k8, round: 1, nextUpdateBy: startOfDay(at(-1)) };
     k8.messages.push({ id: newId('m'), roleId: 'r2', event: 'check_in', at: at(-5), channels: ['inapp', 'whatsapp'],
-      text: `Hi Nikhil, no change yet on your Frontend Engineer (React) application with Northwind Analytics. You're at Flexiple coding test (round 2 of 5), and we expect the next update by ${fmt(k8Snapshot.nextUpdateBy)}.` });
+      text: `Hi Nikhil, no change yet on your Frontend Engineer (React) application with Northwind Analytics. You're at Coding test (round 2 of 5), and we expect the next update by ${fmt(k8Snapshot.nextUpdateBy)}.` });
 
     db.candidates.forEach(c => {
       c.messages.sort((a, b) => a.at - b.at);

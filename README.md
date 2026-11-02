@@ -1,6 +1,6 @@
-# Flexiple Hiring Hub (prototype)
+# Hiring Hub (prototype)
 
-A clickable prototype of one shared, live hiring timeline for the client, the candidate and the Flexiple recruiter, from interview to Day 1. Built as a product exercise by Thamada Ashish. Not an official Flexiple product. All companies, people and data are made up.
+A clickable prototype of one shared, live hiring timeline for the client, the candidate and the recruiter, from interview to Day 1. Built as a product exercise by Thamada Ashish. All companies, people and data are made up.
 
 ## Views
 
