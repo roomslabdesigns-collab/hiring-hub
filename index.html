@@ -7,34 +7,37 @@
 <body>
 <title>Flexiple Hiring Hub</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <style>
-  /* Layout: white sidebar (logo, Main nav, info card) + top bar with name and avatar, then a light-grey
-     working area with white cards whose details sit in a grey bottom panel. Accent is Flexiple green. */
+  /* Layout: dark brand sidebar and top bar, light working area with white cards whose details sit in a
+     pale brand panel. Tokens follow the Flexiple app design system (app.flexiple.com): Geist, a teal-green
+     brand scale at hue 175, a lime accent, green-tinted greys, 16px cards and 10px controls. */
   :root {
-    /* 60% forest green (sidebar, top bar, table headers) · 30% cream (card panels) · 10% lime (main actions,
-       active state). Neutrals are tinted toward the brand green instead of pure grey. */
-    --accent: #072C1B;
-    --accent-hover: #0E3D27;
-    --lime: #CFF07D;
-    --cream: #F9ECE3;
-    --tint: #E3EDE5;
-    --ink: #072C1B;
-    --sub: #4F6357;
-    --line: #DCE5DE;
-    --panel: #F9ECE3;
-    --page: #EEF3EF;
-    --white: #FFFFFF;
-    --good: #16A34A; --good-tint: #E8F5EC;
-    --warn: #B45309; --warn-tint: #FEF3E2;
-    --bad: #DC2626;  --bad-tint: #FDECEC;
-    --r-card: 12px;
-    --r-btn: 8px;
-    --shadow: 0 1px 2px rgba(7, 44, 27, .07), 0 8px 24px rgba(7, 44, 27, .06);
-    --font: Arial, Helvetica, sans-serif;
+    --accent: oklch(26% .05 175);        /* dark brand panel: sidebar, top bar, solid chips */
+    --accent-hover: oklch(32% .06 175);
+    --lime: oklch(84% .223 132);         /* accent-300 */
+    --cream: oklch(94.5% .003 175);      /* light text on the dark brand */
+    --tint: oklch(93% .031 175);         /* brand-100 */
+    --ink: oklch(23.5% .006 175);        /* gray-900 */
+    --sub: oklch(43% .003 175);          /* gray-500 */
+    --line: oklch(90% .003 175);         /* gray-100 */
+    --panel: oklch(96.5% .016 175);      /* brand-50 */
+    --page: oklch(98% .003 175);         /* gray-25 */
+    --white: oklch(100% 0 0);
+    --good: oklch(58.6% .1429 155.2); --good-tint: oklch(95.8% .041 156.4);
+    --warn: oklch(53.9% .1562 43);     --warn-tint: oklch(95.6% .0552 91.4);
+    --bad: oklch(57.6% .2088 29.5);    --bad-tint: oklch(93.9% .0288 23);
+    --r-card: 16px;
+    --r-btn: 10px;
+    --shadow: 0 1px 2px oklch(0% 0 0 / .04), 0 4px 14px oklch(0% 0 0 / .04);
+    --font: "Geist", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color-scheme: light;
   }
   html, body { background: var(--page); color: var(--ink); font-family: var(--font); }
-  body { font-size: 15px; line-height: 1.5; }
+  body { font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { letter-spacing: -0.015em; }
   body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: var(--accent); }
   h1, h2, h3 { text-wrap: balance; }
   .num { font-variant-numeric: tabular-nums; }
@@ -47,17 +50,17 @@
   .sidebar { position: sticky; top: env(safe-area-inset-top, 0px); height: calc(100vh - env(safe-area-inset-top, 0px)); }
 
   /* Card: white top, grey details panel underneath */
-  .card { background: linear-gradient(180deg, #FFFFFF 0%, #FBFDFB 100%); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
   .card-top { padding: 16px 20px; }
   .card-panel { background: var(--panel); padding: 14px 20px; }
   .kv dt { font-size: 13px; color: var(--sub); }
-  .kv dd { margin: 2px 0 0; font-size: 15px; font-weight: 700; color: var(--ink); }
+  .kv dd { margin: 2px 0 0; font-size: 15px; font-weight: 600; color: var(--ink); }
 
   .fade { transition: opacity .2s; }
   .is-loading { opacity: .55; }
   .spinner { width: 14px; height: 14px; border-radius: 999px; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .skeleton { background: linear-gradient(90deg, #E2EAE4 0%, #EDF2EE 50%, #E2EAE4 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
+  .skeleton { background: linear-gradient(90deg, oklch(94.5% .003 175) 0%, oklch(98% .003 175) 50%, oklch(94.5% .003 175) 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
   @keyframes shimmer { to { background-position: -200% 0; } }
 
   .timeline { list-style: none; margin: 0; padding: 0; }
@@ -68,10 +71,10 @@
 
   .table-wrap { position: relative; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--white); box-shadow: var(--shadow); }
   .table-wrap table { width: 100%; border-collapse: collapse; min-width: 780px; font-size: 15px; }
-  .table-wrap th { background: var(--accent); color: var(--lime); text-align: left; font-size: 13px; font-weight: 700; padding: 12px 20px; white-space: nowrap; }
+  .table-wrap th { background: var(--panel); color: var(--sub); text-align: left; font-size: 13px; font-weight: 500; padding: 11px 20px; white-space: nowrap; }
   .table-wrap td { padding: 16px 20px; border-top: 1px solid var(--line); vertical-align: top; }
   .table-wrap tbody tr { transition: background-color .15s; }
-  .table-wrap tbody tr:hover { background: #F6FAF6; }
+  .table-wrap tbody tr:hover { background: var(--page); }
 
   .bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
   .bar > span { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .4s ease; }
@@ -95,10 +98,13 @@
     theme: {
       extend: {
         colors: {
-          accent: '#072C1B', lime: '#CFF07D', cream: '#F9ECE3', tint: '#E3EDE5', ink: '#072C1B', sub: '#4F6357', line: '#DCE5DE', panel: '#F9ECE3', page: '#EEF3EF',
-          good: '#16A34A', bad: '#DC2626', warn: '#B45309',
+          accent: 'oklch(26% .05 175 / <alpha-value>)', lime: 'oklch(84% .223 132 / <alpha-value>)', cream: 'oklch(94.5% .003 175 / <alpha-value>)',
+          tint: 'oklch(93% .031 175 / <alpha-value>)', ink: 'oklch(23.5% .006 175 / <alpha-value>)', sub: 'oklch(43% .003 175 / <alpha-value>)',
+          line: 'oklch(90% .003 175 / <alpha-value>)', panel: 'oklch(96.5% .016 175 / <alpha-value>)', page: 'oklch(98% .003 175 / <alpha-value>)',
+          good: 'oklch(58.6% .1429 155.2 / <alpha-value>)', bad: 'oklch(57.6% .2088 29.5 / <alpha-value>)', warn: 'oklch(53.9% .1562 43 / <alpha-value>)',
         },
-        fontFamily: { sans: ['Arial', 'Helvetica', 'sans-serif'] },
+        fontFamily: { sans: ['Geist', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'], mono: ['Geist Mono', 'ui-monospace', 'monospace'] },
+        fontWeight: { bold: '600' },
       },
     },
   };
@@ -224,8 +230,8 @@ function Icon({ name, size = 16, className = '', strokeWidth = 2 }) {
 function Btn({ kind = 'primary', small, icon, loading, className = '', children, ...props }) {
   const size = small ? 'h-8 px-3 text-[13px] gap-1.5' : 'h-10 px-4 text-sm gap-2';
   const look = {
-    primary: 'bg-lime text-accent border border-[#B4D95C] shadow-[0_1px_2px_rgba(7,44,27,.12)] hover:bg-[#C2E66A]',
-    secondary: 'bg-white text-ink border border-line hover:border-accent/40 hover:bg-[#F6FAF6]',
+    primary: 'bg-lime text-ink border border-[oklch(78%_.21_132)] shadow-[0_1px_2px_oklch(0%_0_0/.08)] hover:bg-[oklch(78%_.21_132)]',
+    secondary: 'bg-white text-ink border border-line hover:border-accent/30 hover:bg-page',
     soft: 'bg-tint text-accent border border-accent/20 hover:border-accent',
     quiet: 'text-sub hover:text-ink hover:bg-tint',
   }[kind];
@@ -233,7 +239,7 @@ function Btn({ kind = 'primary', small, icon, loading, className = '', children,
     <button
       type="button"
       aria-busy={loading || undefined}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-[8px] font-bold transition duration-150 active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${size} ${look} ${className}`}
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-[10px] font-bold transition duration-150 active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${size} ${look} ${className}`}
       {...props}
     >
       {loading ? <span className="spinner" /> : icon && <Icon name={icon} size={small ? 14 : 16} />}
@@ -247,9 +253,9 @@ function Chip({ tone = 'neutral', icon, children, className = '', title }) {
     neutral: 'bg-white text-sub border border-line',
     accent: 'bg-tint text-accent',
     solid: 'bg-accent text-lime',
-    good: 'bg-[var(--good-tint)] text-[#15803D]',
+    good: 'bg-[var(--good-tint)] text-[oklch(49.9%_.1168_157.1)]',
     warn: 'bg-[var(--warn-tint)] text-[var(--warn)]',
-    bad: 'bg-[var(--bad-tint)] text-[#B91C1C]',
+    bad: 'bg-[var(--bad-tint)] text-[oklch(50%_.1821_29.5)]',
   }[tone];
   return (
     <span title={title} className={`inline-flex h-6 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-xs font-bold ${look} ${className}`}>
@@ -326,7 +332,7 @@ function FilterChips({ value, onChange, options, label }) {
             disabled={!on && o.count === 0}
             title={!on && o.count === 0 ? 'Nothing to show' : undefined}
             onClick={() => onChange(o.value)}
-            className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[13px] font-bold transition active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-ink hover:border-accent/40'}`}
+            className={`inline-flex h-8 items-center gap-1.5 rounded-[10px] border px-3 text-[13px] font-bold transition active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-ink hover:border-accent/40'}`}
           >
             {o.label}
             <span className={`num rounded-full px-1.5 text-xs leading-5 ${on ? 'bg-lime text-accent' : 'bg-tint text-sub'}`}>{o.count}</span>
@@ -391,7 +397,7 @@ function PauseControl({ role, busy, run }) {
   if (role.status === 'paused') return <Chip tone="warn" icon="pause">Paused {role.pausedAt ? fmt(role.pausedAt) : ''}</Chip>;
   if (!confirming) return <Btn small kind="secondary" icon="pause" disabled={!!busy} onClick={() => setConfirming(true)}>Pause role</Btn>;
   return (
-    <div className="sent-flash flex flex-wrap items-center gap-2 rounded-[8px] border border-line bg-white p-1.5 pl-3">
+    <div className="sent-flash flex flex-wrap items-center gap-2 rounded-[10px] border border-line bg-white p-1.5 pl-3">
       <span className="text-[13px]">{role.activeCount ? `${plural(role.activeCount, 'candidate')} will get an outcome draft.` : 'No one is in process.'}</span>
       <Btn small icon="pause" loading={busy === 'pause-' + role.id} onClick={() => {
         setConfirming(false);
@@ -586,7 +592,7 @@ function Alerts({ version, busy, run }) {
       ) : (
         <ul className={`fade card grid ${loading ? 'is-loading' : ''}`}>
           {shown.map((c, i) => (
-            <li key={c.id} className={`flex items-center gap-3 px-4 py-3.5 transition hover:bg-[#FCFCFC] ${i ? 'border-t border-line' : ''}`}>
+            <li key={c.id} className={`flex items-center gap-3 px-4 py-3.5 transition hover:bg-page ${i ? 'border-t border-line' : ''}`}>
               <Avatar name={c.name} size={40} status={c.daysWaiting >= 8 ? 'bad' : 'good'} />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold">{c.name}</p>
@@ -671,7 +677,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
           <textarea
             id={`draft-text-${d.id}`}
             aria-label={`Message to ${d.candidateName}`}
-            className="mt-2 block w-full rounded-[8px] border-2 border-accent bg-white p-3 text-[15px] leading-relaxed text-ink outline-none"
+            className="mt-2 block w-full rounded-[10px] border-2 border-accent bg-white p-3 text-[15px] leading-relaxed text-ink outline-none"
             rows={5}
             value={text}
             onChange={e => setText(e.target.value)}
@@ -695,7 +701,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
                 aria-pressed={on}
                 title={on && channels.length === 1 ? 'At least one channel is needed' : `${on ? 'Remove' : 'Add'} ${CHANNEL[ch].label}`}
                 onClick={() => toggle(ch)}
-                className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[13px] font-bold transition active:scale-[.97] ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-sub hover:text-ink'}`}
+                className={`inline-flex h-8 items-center gap-1.5 rounded-[10px] border px-3 text-[13px] font-bold transition active:scale-[.97] ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-sub hover:text-ink'}`}
               >
                 <Icon name={on ? 'check' : CHANNEL[ch].icon} size={12} strokeWidth={on ? 3 : 2} />{CHANNEL[ch].label}
               </button>
@@ -704,7 +710,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
         </div>
 
         {d.guard.blocked ? (
-          <div className="flex gap-2 rounded-[8px] bg-[var(--bad-tint)] p-3 text-[13px] leading-relaxed text-[#B91C1C]" role="note">
+          <div className="flex gap-2 rounded-[10px] bg-[var(--bad-tint)] p-3 text-[13px] leading-relaxed text-[oklch(50%_.1821_29.5)]" role="note">
             <Icon name="alert" size={16} className="mt-0.5" />
             <p><b>Weekly limit reached.</b> {d.guard.reason}</p>
           </div>
@@ -777,7 +783,7 @@ function Pipeline({ version, busy, run }) {
               role="tab"
               aria-selected={on}
               onClick={() => setRid(r.id)}
-              className={`flex shrink-0 items-center gap-2 rounded-[8px] border py-1.5 pl-3 pr-1.5 text-left text-[13px] font-bold transition active:scale-[.98] ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-ink hover:border-accent/40'}`}
+              className={`flex shrink-0 items-center gap-2 rounded-[10px] border py-1.5 pl-3 pr-1.5 text-left text-[13px] font-bold transition active:scale-[.98] ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-ink hover:border-accent/40'}`}
             >
               <span className="whitespace-nowrap">{r.title}</span>
               <span className={`num rounded-full px-2 text-xs leading-5 ${on ? 'bg-lime text-accent' : 'bg-tint text-sub'}`}>{r.activeCount}</span>
@@ -893,7 +899,7 @@ function HiringBoard({ companyId, version, busy, run }) {
   return (
     <section className="grid gap-4">
       <SectionHead title="Your roles" note="Candidates in each round and how recently anyone moved.">
-        <div className="flex rounded-[8px] border border-line bg-white p-1" role="radiogroup" aria-label="Layout">
+        <div className="flex rounded-[10px] border border-line bg-white p-1" role="radiogroup" aria-label="Layout">
           {[['cards', 'grid', 'Cards'], ['list', 'list', 'List']].map(([v, icon, label]) => (
             <button key={v} type="button" role="radio" aria-checked={layout === v} onClick={() => setLayout(v)}
               className={`inline-flex h-8 items-center gap-1.5 rounded-[6px] px-3 text-[13px] font-bold transition ${layout === v ? 'bg-accent text-lime' : 'text-sub hover:text-ink'}`}>
@@ -917,7 +923,7 @@ function HiringBoard({ companyId, version, busy, run }) {
                 </div>
                 <div className="card-panel flex flex-1 flex-col gap-3">
                   <StageBars r={r} />
-                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[#EADBCF] pt-3">
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
                     <p className={`text-[13px] ${longest >= 8 ? 'font-bold text-bad' : 'text-sub'}`}>
                       {r.activeCount ? `Longest wait: ${plural(longest, 'day')}` : r.offerCount ? plural(r.offerCount, 'offer') + ' out' : 'No one in process'}
                     </p>
@@ -1016,7 +1022,7 @@ function OffersTable({ companyId, version, busy, run }) {
                           </Btn>
                           {o.risk.level === 'High' && o.runnerUp && (
                             <button type="button" aria-expanded={openBackup === o.candidateId} onClick={() => setOpenBackup(openBackup === o.candidateId ? null : o.candidateId)}
-                              className="sent-flash inline-flex h-8 items-center gap-1.5 rounded-[8px] border border-accent/30 bg-tint px-3 text-[13px] font-bold text-accent transition hover:border-accent active:scale-[.97]">
+                              className="sent-flash inline-flex h-8 items-center gap-1.5 rounded-[10px] border border-accent/30 bg-tint px-3 text-[13px] font-bold text-accent transition hover:border-accent active:scale-[.97]">
                               <Icon name="userCheck" size={14} />Backup ready<Icon name={openBackup === o.candidateId ? 'chevronUp' : 'chevronDown'} size={14} />
                             </button>
                           )}
@@ -1074,7 +1080,7 @@ const VIEWS = [
 function Logo() {
   return (
     <p className="flex items-center gap-2">
-      <span className="grid h-8 w-8 place-items-center rounded-[8px] bg-lime text-sm font-bold text-accent" aria-hidden="true">f</span>
+      <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-lime text-sm font-bold text-accent" aria-hidden="true">f</span>
       <span className="leading-tight">
         <span className="block text-lg font-bold text-lime">flexiple</span>
         <span className="block text-[11px] text-cream/70">Hiring Hub</span>
@@ -1091,7 +1097,7 @@ function ViewPicker({ id, label, value, onChange, options }) {
         id={id}
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="h-10 w-full max-w-full cursor-pointer appearance-none truncate rounded-[8px] border border-white/20 bg-white/10 pl-3 pr-9 text-sm font-bold text-white transition hover:border-lime sm:w-auto sm:max-w-[320px]"
+        className="h-10 w-full max-w-full cursor-pointer appearance-none truncate rounded-[10px] border border-white/20 bg-white/10 pl-3 pr-9 text-sm font-bold text-white transition hover:border-lime sm:w-auto sm:max-w-[320px]"
       >
         {options.map(o => <option key={o.value} value={o.value} className="bg-white text-ink">{o.label}</option>)}
       </select>
@@ -1147,8 +1153,8 @@ function App() {
         aria-selected={on}
         onClick={() => go(v.key)}
         className={mobile
-          ? `relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[8px] px-3 text-[13px] font-bold transition ${on ? 'bg-lime text-accent' : 'text-cream/75 hover:text-white'}`
-          : `relative flex h-11 w-full items-center gap-3 rounded-[8px] px-4 text-[15px] transition ${on ? 'bg-lime font-bold text-accent' : 'text-cream/85 hover:bg-white/10 hover:text-white'}`}
+          ? `relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-bold transition ${on ? 'bg-lime text-accent' : 'text-cream/75 hover:text-white'}`
+          : `relative flex h-11 w-full items-center gap-3 rounded-[10px] px-4 text-[15px] transition ${on ? 'bg-lime font-bold text-accent' : 'text-cream/85 hover:bg-white/10 hover:text-white'}`}
       >
         {on && !mobile && <span className="absolute -left-4 top-1 bottom-1 w-[3px] rounded-r bg-lime" aria-hidden="true" />}
         <Icon name={v.icon} size={mobile ? 16 : 18} />
