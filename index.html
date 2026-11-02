@@ -11,27 +11,31 @@
   /* Layout: white sidebar (logo, Main nav, info card) + top bar with name and avatar, then a light-grey
      working area with white cards whose details sit in a grey bottom panel. Accent is Flexiple green. */
   :root {
+    /* 60% forest green (sidebar, top bar, table headers) · 30% cream (card panels) · 10% lime (main actions,
+       active state). Neutrals are tinted toward the brand green instead of pure grey. */
     --accent: #072C1B;
     --accent-hover: #0E3D27;
-    --tint: #EDF3EE;
-    --ink: #141414;
-    --sub: #6B7280;
-    --line: #ECECEC;
-    --panel: #F7F7F7;
-    --page: #FAFAFA;
+    --lime: #CFF07D;
+    --cream: #F9ECE3;
+    --tint: #E3EDE5;
+    --ink: #072C1B;
+    --sub: #4F6357;
+    --line: #DCE5DE;
+    --panel: #F9ECE3;
+    --page: #EEF3EF;
     --white: #FFFFFF;
     --good: #16A34A; --good-tint: #E8F5EC;
     --warn: #B45309; --warn-tint: #FEF3E2;
     --bad: #DC2626;  --bad-tint: #FDECEC;
     --r-card: 12px;
     --r-btn: 8px;
-    --shadow: 0 1px 2px rgba(20, 20, 20, .04);
+    --shadow: 0 1px 2px rgba(7, 44, 27, .07), 0 8px 24px rgba(7, 44, 27, .06);
     --font: Arial, Helvetica, sans-serif;
     color-scheme: light;
   }
   html, body { background: var(--page); color: var(--ink); font-family: var(--font); }
   body { font-size: 15px; line-height: 1.5; }
-  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: var(--white); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: var(--accent); }
   h1, h2, h3 { text-wrap: balance; }
   .num { font-variant-numeric: tabular-nums; }
   .grid > * { min-width: 0; }
@@ -43,7 +47,7 @@
   .sidebar { position: sticky; top: env(safe-area-inset-top, 0px); height: calc(100vh - env(safe-area-inset-top, 0px)); }
 
   /* Card: white top, grey details panel underneath */
-  .card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+  .card { background: linear-gradient(180deg, #FFFFFF 0%, #FBFDFB 100%); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
   .card-top { padding: 20px; }
   .card-panel { background: var(--panel); padding: 20px; }
   .kv dt { font-size: 13px; color: var(--sub); }
@@ -53,7 +57,7 @@
   .is-loading { opacity: .55; }
   .spinner { width: 14px; height: 14px; border-radius: 999px; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .skeleton { background: linear-gradient(90deg, #F2F2F2 0%, #F9F9F9 50%, #F2F2F2 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
+  .skeleton { background: linear-gradient(90deg, #E2EAE4 0%, #EDF2EE 50%, #E2EAE4 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: var(--r-card); }
   @keyframes shimmer { to { background-position: -200% 0; } }
 
   /* Round tracker */
@@ -63,8 +67,8 @@
   .track li:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: 32px; bottom: 4px; width: 2px; border-radius: 2px; background: var(--line); }
   .track li.done:not(:last-child)::after { background: var(--accent); }
   .track .dot { flex: none; width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--white); border: 2px solid var(--line); color: var(--sub); position: relative; z-index: 1; }
-  .track .done .dot { background: var(--accent); border-color: var(--accent); color: var(--white); }
-  .track .current .dot { background: var(--white); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 5px var(--tint); }
+  .track .done .dot { background: var(--accent); border-color: var(--accent); color: var(--lime); }
+  .track .current .dot { background: var(--lime); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 5px rgba(207, 240, 125, .45); }
   .track .stopped .dot { background: var(--bad); border-color: var(--bad); color: var(--white); }
   .track .upcoming .name { color: var(--sub); }
   .track .current .name, .track .done .name { font-weight: 700; }
@@ -82,12 +86,12 @@
 
   .table-wrap { position: relative; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--white); box-shadow: var(--shadow); }
   .table-wrap table { width: 100%; border-collapse: collapse; min-width: 780px; font-size: 15px; }
-  .table-wrap th { background: var(--panel); color: var(--sub); text-align: left; font-size: 13px; font-weight: 400; padding: 12px 20px; white-space: nowrap; }
+  .table-wrap th { background: var(--accent); color: var(--lime); text-align: left; font-size: 13px; font-weight: 700; padding: 12px 20px; white-space: nowrap; }
   .table-wrap td { padding: 16px 20px; border-top: 1px solid var(--line); vertical-align: top; }
   .table-wrap tbody tr { transition: background-color .15s; }
-  .table-wrap tbody tr:hover { background: #FCFCFC; }
+  .table-wrap tbody tr:hover { background: #F6FAF6; }
 
-  .bar { height: 6px; border-radius: 999px; background: #E9E9E9; overflow: hidden; }
+  .bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
   .bar > span { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .4s ease; }
 
   .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 50; max-width: calc(100% - 32px); width: max-content; transform: translateX(-50%); animation: toast-in .28s cubic-bezier(.2, .8, .2, 1); box-shadow: 0 8px 32px rgba(20, 20, 20, .18); }
@@ -109,7 +113,7 @@
     theme: {
       extend: {
         colors: {
-          accent: '#072C1B', tint: '#EDF3EE', ink: '#141414', sub: '#6B7280', line: '#ECECEC', panel: '#F7F7F7', page: '#FAFAFA',
+          accent: '#072C1B', lime: '#CFF07D', cream: '#F9ECE3', tint: '#E3EDE5', ink: '#072C1B', sub: '#4F6357', line: '#DCE5DE', panel: '#F9ECE3', page: '#EEF3EF',
           good: '#16A34A', bad: '#DC2626', warn: '#B45309',
         },
         fontFamily: { sans: ['Arial', 'Helvetica', 'sans-serif'] },
@@ -238,10 +242,10 @@ function Icon({ name, size = 16, className = '', strokeWidth = 2 }) {
 function Btn({ kind = 'primary', small, icon, loading, className = '', children, ...props }) {
   const size = small ? 'h-8 px-3 text-[13px] gap-1.5' : 'h-10 px-4 text-sm gap-2';
   const look = {
-    primary: 'bg-accent text-white hover:bg-[#0E3D27]',
-    secondary: 'bg-white text-ink border border-line hover:border-[#D4D4D4] hover:bg-panel',
-    soft: 'bg-tint text-accent border border-accent/30 hover:border-accent',
-    quiet: 'text-sub hover:text-ink hover:bg-panel',
+    primary: 'bg-lime text-accent border border-[#B4D95C] shadow-[0_1px_2px_rgba(7,44,27,.12)] hover:bg-[#C2E66A]',
+    secondary: 'bg-white text-ink border border-line hover:border-accent/40 hover:bg-[#F6FAF6]',
+    soft: 'bg-tint text-accent border border-accent/20 hover:border-accent',
+    quiet: 'text-sub hover:text-ink hover:bg-tint',
   }[kind];
   return (
     <button
@@ -260,7 +264,7 @@ function Chip({ tone = 'neutral', icon, children, className = '', title }) {
   const look = {
     neutral: 'bg-white text-sub border border-line',
     accent: 'bg-tint text-accent',
-    solid: 'bg-accent text-white',
+    solid: 'bg-accent text-lime',
     good: 'bg-[var(--good-tint)] text-[#15803D]',
     warn: 'bg-[var(--warn-tint)] text-[var(--warn)]',
     bad: 'bg-[var(--bad-tint)] text-[#B91C1C]',
@@ -288,12 +292,12 @@ function WaitChip({ days }) {
   return <Chip tone={days >= 8 ? 'bad' : 'neutral'} icon="clock" className="num" title={`${plural(days, 'day')} since the last update`}>{plural(days, 'day')}</Chip>;
 }
 
-function Avatar({ name, size = 40, status }) {
+function Avatar({ name, size = 40, status, onDark }) {
   const initials = name.split(' ').map(p => p[0]).slice(0, 2).join('');
   const dot = status && { good: 'bg-good', bad: 'bg-bad', warn: 'bg-[#F59E0B]' }[status];
   return (
     <span className="relative inline-grid shrink-0" style={{ width: size, height: size }} aria-hidden="true">
-      <span className="grid h-full w-full place-items-center rounded-full bg-tint font-bold text-accent" style={{ fontSize: size * 0.36 }}>{initials}</span>
+      <span className={`grid h-full w-full place-items-center rounded-full font-bold ${onDark ? 'bg-lime text-accent' : 'bg-tint text-accent'}`} style={{ fontSize: size * 0.36 }}>{initials}</span>
       {dot && <span className={`absolute bottom-0 right-0 rounded-full border-2 border-white ${dot}`} style={{ width: size * 0.3, height: size * 0.3 }} />}
     </span>
   );
@@ -340,10 +344,10 @@ function FilterChips({ value, onChange, options, label }) {
             disabled={!on && o.count === 0}
             title={!on && o.count === 0 ? 'Nothing to show' : undefined}
             onClick={() => onChange(o.value)}
-            className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[13px] font-bold transition active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'border-accent bg-tint text-accent' : 'border-line bg-white text-ink hover:border-[#D4D4D4]'}`}
+            className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[13px] font-bold transition active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-ink hover:border-accent/40'}`}
           >
             {o.label}
-            <span className={`num rounded-full px-1.5 text-xs leading-5 ${on ? 'bg-accent text-white' : 'bg-panel text-sub'}`}>{o.count}</span>
+            <span className={`num rounded-full px-1.5 text-xs leading-5 ${on ? 'bg-lime text-accent' : 'bg-tint text-sub'}`}>{o.count}</span>
           </button>
         );
       })}
@@ -457,12 +461,12 @@ function OutcomeCard({ c }) {
   }[c.status];
   if (!content) return null;
   return (
-    <section className="sent-flash card flex gap-4 border-accent/20 bg-tint p-5" aria-label="Application outcome">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-white"><Icon name={content.icon} size={18} /></span>
+    <section className="sent-flash flex gap-4 rounded-[12px] bg-accent p-5 shadow-[var(--shadow)]" aria-label="Application outcome">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-lime text-accent"><Icon name={content.icon} size={18} /></span>
       <div className="min-w-0">
         <Chip tone={content.tone}>{content.chip}</Chip>
-        <h3 className="mt-2 text-lg font-bold text-accent">{content.title}</h3>
-        <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-ink">{content.body}</p>
+        <h3 className="mt-2 text-lg font-bold text-lime">{content.title}</h3>
+        <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-cream">{content.body}</p>
       </div>
     </section>
   );
@@ -643,7 +647,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
   if (sent) {
     return (
       <article className="card sent-flash flex items-center gap-3 !border-transparent !bg-[var(--good-tint)] p-5">
-        <span className="pop grid h-9 w-9 place-items-center rounded-full bg-accent text-white"><Icon name="check" size={18} strokeWidth={3} /></span>
+        <span className="pop grid h-9 w-9 place-items-center rounded-full bg-accent text-lime"><Icon name="check" size={18} strokeWidth={3} /></span>
         <div>
           <p className="font-bold text-accent">Sent to {d.candidateName}</p>
           <p className="text-[13px] text-sub">Added to {first}'s update history.</p>
@@ -694,7 +698,7 @@ function DraftCard({ d, bump, notify, busy, setBusy }) {
                 aria-pressed={on}
                 title={on && channels.length === 1 ? 'At least one channel is needed' : `${on ? 'Remove' : 'Add'} ${CHANNEL[ch].label}`}
                 onClick={() => toggle(ch)}
-                className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[13px] font-bold transition active:scale-[.97] ${on ? 'border-accent bg-tint text-accent' : 'border-line bg-white text-sub hover:text-ink'}`}
+                className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[13px] font-bold transition active:scale-[.97] ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-sub hover:text-ink'}`}
               >
                 <Icon name={on ? 'check' : CHANNEL[ch].icon} size={12} strokeWidth={on ? 3 : 2} />{CHANNEL[ch].label}
               </button>
@@ -751,7 +755,7 @@ function RoundDots({ round, total, status }) {
   return (
     <span className="mt-1.5 flex gap-1" aria-hidden="true">
       {Array.from({ length: total }).map((_, i) => (
-        <span key={i} className={`h-1.5 w-4 rounded-full ${i < round ? 'bg-accent' : i === round ? (status === 'active' ? 'bg-accent/40' : 'bg-bad') : 'bg-[#E5E5E5]'}`} />
+        <span key={i} className={`h-1.5 w-4 rounded-full ${i < round ? 'bg-accent' : i === round ? (status === 'active' ? 'bg-lime ring-1 ring-accent' : 'bg-bad') : 'bg-line'}`} />
       ))}
     </span>
   );
@@ -776,10 +780,10 @@ function Pipeline({ version, busy, run }) {
               role="tab"
               aria-selected={on}
               onClick={() => setRid(r.id)}
-              className={`flex shrink-0 items-center gap-2 rounded-[8px] border py-1.5 pl-3 pr-1.5 text-left text-[13px] font-bold transition active:scale-[.98] ${on ? 'border-accent bg-tint text-accent' : 'border-line bg-white text-ink hover:border-[#D4D4D4]'}`}
+              className={`flex shrink-0 items-center gap-2 rounded-[8px] border py-1.5 pl-3 pr-1.5 text-left text-[13px] font-bold transition active:scale-[.98] ${on ? 'border-accent bg-accent text-lime' : 'border-line bg-white text-ink hover:border-accent/40'}`}
             >
               <span className="whitespace-nowrap">{r.title}</span>
-              <span className={`num rounded-full px-2 text-xs leading-5 ${on ? 'bg-accent text-white' : 'bg-panel text-sub'}`}>{r.activeCount}</span>
+              <span className={`num rounded-full px-2 text-xs leading-5 ${on ? 'bg-lime text-accent' : 'bg-tint text-sub'}`}>{r.activeCount}</span>
             </button>
           );
         })}
@@ -895,7 +899,7 @@ function HiringBoard({ companyId, version, busy, run }) {
         <div className="flex rounded-[8px] border border-line bg-white p-1" role="radiogroup" aria-label="Layout">
           {[['cards', 'grid', 'Cards'], ['list', 'list', 'List']].map(([v, icon, label]) => (
             <button key={v} type="button" role="radio" aria-checked={layout === v} onClick={() => setLayout(v)}
-              className={`inline-flex h-8 items-center gap-1.5 rounded-[6px] px-3 text-[13px] font-bold transition ${layout === v ? 'bg-tint text-accent' : 'text-sub hover:text-ink'}`}>
+              className={`inline-flex h-8 items-center gap-1.5 rounded-[6px] px-3 text-[13px] font-bold transition ${layout === v ? 'bg-accent text-lime' : 'text-sub hover:text-ink'}`}>
               <Icon name={icon} size={14} />{label}
             </button>
           ))}
@@ -1080,10 +1084,10 @@ const VIEWS = [
 function Logo() {
   return (
     <p className="flex items-center gap-2">
-      <span className="grid h-8 w-8 place-items-center rounded-[8px] bg-accent text-sm font-bold text-white" aria-hidden="true">f</span>
+      <span className="grid h-8 w-8 place-items-center rounded-[8px] bg-lime text-sm font-bold text-accent" aria-hidden="true">f</span>
       <span className="leading-tight">
-        <span className="block text-lg font-bold text-accent">flexiple</span>
-        <span className="block text-[11px] text-sub">Hiring Hub</span>
+        <span className="block text-lg font-bold text-lime">flexiple</span>
+        <span className="block text-[11px] text-cream/70">Hiring Hub</span>
       </span>
     </p>
   );
@@ -1097,11 +1101,11 @@ function ViewPicker({ id, label, value, onChange, options }) {
         id={id}
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="h-10 w-full max-w-full cursor-pointer appearance-none truncate rounded-[8px] border border-accent/30 bg-tint pl-3 pr-9 text-sm font-bold text-accent transition hover:border-accent sm:w-auto sm:max-w-[320px]"
+        className="h-10 w-full max-w-full cursor-pointer appearance-none truncate rounded-[8px] border border-white/20 bg-white/10 pl-3 pr-9 text-sm font-bold text-white transition hover:border-lime sm:w-auto sm:max-w-[320px]"
       >
-        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        {options.map(o => <option key={o.value} value={o.value} className="bg-white text-ink">{o.label}</option>)}
       </select>
-      <Icon name="chevronDown" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-accent" />
+      <Icon name="chevronDown" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-lime" />
     </div>
   );
 }
@@ -1153,10 +1157,10 @@ function App() {
         aria-selected={on}
         onClick={() => go(v.key)}
         className={mobile
-          ? `relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[8px] px-3 text-[13px] font-bold transition ${on ? 'bg-tint text-accent' : 'text-sub hover:text-ink'}`
-          : `relative flex h-11 w-full items-center gap-3 rounded-[8px] px-4 text-[15px] transition ${on ? 'bg-tint font-bold text-accent' : 'text-ink hover:bg-panel'}`}
+          ? `relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[8px] px-3 text-[13px] font-bold transition ${on ? 'bg-lime text-accent' : 'text-cream/75 hover:text-white'}`
+          : `relative flex h-11 w-full items-center gap-3 rounded-[8px] px-4 text-[15px] transition ${on ? 'bg-lime font-bold text-accent' : 'text-cream/85 hover:bg-white/10 hover:text-white'}`}
       >
-        {on && !mobile && <span className="absolute -left-4 top-1 bottom-1 w-[3px] rounded-r bg-accent" aria-hidden="true" />}
+        {on && !mobile && <span className="absolute -left-4 top-1 bottom-1 w-[3px] rounded-r bg-lime" aria-hidden="true" />}
         <Icon name={v.icon} size={mobile ? 16 : 18} />
         <span className="flex-1 text-left">{mobile ? v.short : v.label}</span>
         {v.key === 'recruiter' && pending > 0 && (
@@ -1168,30 +1172,30 @@ function App() {
 
   return (
     <div className="lg:flex">
-      <aside className="sidebar hidden w-[248px] shrink-0 flex-col border-r border-line bg-white lg:flex">
-        <div className="flex h-[76px] items-center border-b border-line px-6"><Logo /></div>
+      <aside className="sidebar hidden w-[248px] shrink-0 flex-col bg-accent text-cream lg:flex">
+        <div className="flex h-[76px] items-center border-b border-white/10 px-6"><Logo /></div>
         <nav className="flex-1 overflow-y-auto px-4 py-6" aria-label="Views">
-          <p className="mb-2 px-4 text-[13px] text-sub">Main</p>
+          <p className="mb-2 px-4 text-[13px] text-cream/60">Main</p>
           <div role="tablist" aria-label="Switch view" className="grid gap-1">{VIEWS.map(v => navItem(v, false))}</div>
         </nav>
         <div className="p-4">
-          <div className="rounded-[12px] bg-tint p-5 text-center">
-            <span className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-accent text-white"><Icon name="info" size={20} /></span>
-            <p className="mt-3 font-bold">Prototype</p>
-            <p className="mt-1 text-xs text-sub">Sample data and a simulated API. No messages are really sent.</p>
+          <div className="rounded-[12px] border border-white/10 bg-white/[.06] p-5 text-center">
+            <span className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-lime text-accent"><Icon name="info" size={20} /></span>
+            <p className="mt-3 font-bold text-white">Prototype</p>
+            <p className="mt-1 text-xs text-cream/70">Sample data and a simulated API. No messages are really sent.</p>
             <Btn small className="mt-4 w-full" icon="refresh" onClick={reset}>Reset demo data</Btn>
           </div>
         </div>
       </aside>
 
       <div className="min-w-0 flex-1">
-        <header className="topbar border-b border-line bg-white">
+        <header className="topbar border-b border-white/10 bg-accent">
           <div className="gutter flex min-h-[76px] flex-wrap items-center justify-between gap-x-4 gap-y-3 py-3">
             <div className="flex min-w-0 items-center gap-4">
               <div className="lg:hidden"><Logo /></div>
               <div className="hidden min-w-0 lg:block">
-                <h1 className="truncate text-xl font-bold leading-tight">{who.name}</h1>
-                <p className="truncate text-[13px] text-sub">{who.sub}</p>
+                <h1 className="truncate text-xl font-bold leading-tight text-white">{who.name}</h1>
+                <p className="truncate text-[13px] text-cream/70">{who.sub}</p>
               </div>
             </div>
             <div className="flex min-w-0 items-center gap-3">
@@ -1205,15 +1209,15 @@ function App() {
               )}
               {view === 'recruiter' && (
                 <button type="button" onClick={() => document.getElementById('drafts')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="relative grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-ink transition hover:bg-panel" title={pending ? `${pending} drafts to approve` : 'No drafts waiting'} aria-label="Drafts to approve">
+                  className="relative grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-cream transition hover:bg-white/20" title={pending ? `${pending} drafts to approve` : 'No drafts waiting'} aria-label="Drafts to approve">
                   <Icon name="bell" size={18} />
                   {pending > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-bad" aria-hidden="true" />}
                 </button>
               )}
-              <Avatar name={who.name === '…' ? 'Hiring Hub' : who.name} size={40} />
+              <Avatar name={who.name === '…' ? 'Hiring Hub' : who.name} size={40} onDark />
             </div>
           </div>
-          <div className="gutter flex gap-1 overflow-x-auto border-t border-line py-2 lg:hidden" role="tablist" aria-label="Switch view">
+          <div className="gutter flex gap-1 overflow-x-auto border-t border-white/10 py-2 lg:hidden" role="tablist" aria-label="Switch view">
             {VIEWS.map(v => navItem(v, true))}
           </div>
         </header>
@@ -1235,7 +1239,7 @@ function App() {
 
       <div aria-live="polite">
         {toast && (
-          <div key={toast.key} role="status" className={`toast flex items-center gap-2 rounded-[10px] py-3 pl-3 pr-5 text-sm font-bold ${toast.tone === 'error' ? 'bg-bad text-white' : 'bg-accent text-white'}`}>
+          <div key={toast.key} role="status" className={`toast flex items-center gap-2 rounded-[10px] py-3 pl-3 pr-5 text-sm font-bold ${toast.tone === 'error' ? 'bg-bad text-white' : 'bg-accent text-lime'}`}>
             <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/20">
               <Icon name={toast.tone === 'error' ? 'alert' : 'check'} size={14} strokeWidth={3} />
             </span>
